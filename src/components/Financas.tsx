@@ -12,6 +12,7 @@ import { Button } from './ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Input } from './ui/input'
 import { format } from 'date-fns'
+import type React from 'react'
 import { useState } from 'react'
 
 type dr = {
@@ -46,6 +47,8 @@ const receitas: dr[] = [
 
 export default function Financas() {
   const [mesBusca, setMesBusca] = useState(0)
+  const [startX, setStartX] = useState<number | null>(null)
+  const [resultado, seResultado] = useState<string | null>('')
   const currentDate = new Date()
 
   const mes = navigationMes(
@@ -60,7 +63,6 @@ export default function Financas() {
   }
 
   const prev = () => {
-    console.log('cliecdo')
     setMesBusca(mesBusca - 1)
   }
 
@@ -85,67 +87,120 @@ export default function Financas() {
     (a, b) => new Date(a.date).getTime() + new Date(b.date).getTime()
   )
 
+  const handleTouchStart = (e: React.TouchEvent<HTMLTableRowElement>) => {
+    setStartX(e.touches[0].clientX)
+  }
+
+  const handleDragStart = (e: React.DragEvent<HTMLTableRowElement>) => {
+    setStartX(e.clientX)
+  }
+
+  const handleTouchEnd = (
+    e: React.TouchEvent<HTMLTableRowElement>,
+    id: string
+  ) => {
+    if (startX === null) return
+
+    const endX = e.changedTouches[0].clientX
+    const distance = endX - startX
+
+    if (distance > 50) {
+      console.log('foi para direita', id)
+      seResultado(`editar ${id}`)
+    }
+    if (distance < -50) {
+      console.log('foi para esquerda', id)
+      seResultado(`deletar ${id}`)
+    }
+
+    setStartX(null)
+  }
+
+  const handleDragEnd = (
+    e: React.DragEvent<HTMLTableRowElement>,
+    id: string
+  ) => {
+    if (startX === null) return
+
+    const dragDistance = e.clientX - startX
+    if (dragDistance > 50) {
+      console.log('arrantou para direita', id)
+      seResultado(`Editar ${id}`)
+    }
+    if (dragDistance < -50) {
+      console.log('arrastou para esquerda', id)
+      seResultado(`Deletar ${id}`)
+    }
+    setStartX(null)
+  }
+
   return (
     <div>
-      <div>
-        <form className="space-y-4 mb-6">
-          <div className="flex justify-between mt-2 gap-4">
-            <div className="flex items-center w-full ">
-              <Button type="button" variant={'destructive'} className="w-full">
-                <Label>PAY 500,00</Label>
-              </Button>
-            </div>
-            <div className="flex items-center w-full ">
-              <Button type="button" className="w-full">
-                <Label>REC 5000,00</Label>
-              </Button>
-            </div>
+      {resultado && resultado}
+      <form className="space-y-4 mb-6">
+        <div className="flex justify-between mt-2 gap-4">
+          <div className="flex items-center w-full ">
+            <Button type="button" variant={'destructive'} className="w-full">
+              <Label>PAY 500,00</Label>
+            </Button>
           </div>
-          <div className="flex gap-4">
-            <div className="w-8/12">
-              <Input required placeholder="Description" />
-            </div>
-            <div className="w-4/12">
-              <Input required placeholder="value" />
-            </div>
+          <div className="flex items-center w-full ">
+            <Button type="button" className="w-full">
+              <Label>REC 5000,00</Label>
+            </Button>
           </div>
-        </form>
-        <hr className="bg-white" />
-        <div className="flex justify-between">
-          <Button onClick={() => prev()}>
-            <ChevronLeft />
-          </Button>
-          <div
-            className="flex text-center items-center"
-            onClick={() => setMesBusca(0)}
-            onKeyDown={() => console.log('down')}
-          >
-            {mes.name} / {mes.year}
-          </div>
-          <Button onClick={() => next()}>
-            <ChevronRight />
-          </Button>
         </div>
-        <hr className="bg-white" />
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-10">date</TableHead>
-              <TableHead>desc</TableHead>
-              <TableHead>value</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transacoesby.map((tra, index) => (
-              <TableRow key={Number(index)}>
-                <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell>
-                <TableCell>{tra.desc}</TableCell>
-                <TableCell className="text-end">{tra.value}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="flex gap-4">
+          <div className="w-8/12">
+            <Input required placeholder="Description" />
+          </div>
+          <div className="w-4/12">
+            <Input required placeholder="value" />
+          </div>
+        </div>
+      </form>
+      <hr className="bg-white" />
+      <div className="flex justify-between">
+        <Button onClick={() => prev()}>
+          <ChevronLeft />
+        </Button>
+        <div
+          className="flex text-center items-center"
+          onClick={() => setMesBusca(0)}
+          onKeyDown={() => console.log('down')}
+        >
+          {mes.name} / {mes.year}
+        </div>
+        <Button onClick={() => next()}>
+          <ChevronRight />
+        </Button>
       </div>
+      <hr className="bg-white" />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10">date</TableHead>
+            <TableHead>desc</TableHead>
+            <TableHead>value</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {transacoesby.map((tra, index) => (
+            <TableRow
+              key={Number(index)}
+              draggable
+              onTouchStart={handleTouchStart}
+              onTouchEnd={e => handleTouchEnd(e, String(index))}
+              onDragStart={handleDragStart}
+              onDragEnd={e => handleDragEnd(e, String(index))}
+            >
+              <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell>
+              <TableCell>{tra.desc}</TableCell>
+              <TableCell className="text-end">{tra.value}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }
