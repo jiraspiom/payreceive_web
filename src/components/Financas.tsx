@@ -1,3 +1,4 @@
+'use client'
 import {
   Table,
   TableBody,
@@ -8,23 +9,78 @@ import {
 } from './ui/table'
 import { Label } from './ui/label'
 import { Button } from './ui/button'
-import { PlusCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Input } from './ui/input'
+import { format } from 'date-fns'
+import { useState } from 'react'
 
-const transacoes = [
+type dr = {
+  id: number
+  desc: string
+  value: number
+  date: Date
+}
+
+const despesas: dr[] = [
   {
     id: 1,
     desc: 'primeiro carinha aqui que nao sei o que e',
     value: 55,
-    date: '01/01/2020',
+    date: new Date('01/01/2020'),
   },
-  { id: 2, desc: 'segundo', value: 11, date: '02/01/2020' },
-  { id: 3, desc: 'terce', value: 1, date: '02/01/2020' },
-  { id: 4, desc: 'terce', value: 31, date: '05/01/2020' },
-  { id: 5, desc: 'salario', value: '500.000,00', date: '01/01/2020' },
+  { id: 2, desc: 'segundo', value: 11, date: new Date('2020-01-01') },
+  { id: 3, desc: 'terce', value: 1, date: new Date('2020-01-03') },
+  { id: 4, desc: 'terce', value: 31, date: new Date('2020-01-06') },
+  { id: 5, desc: 'salario', value: 500, date: new Date('2020-01-11') },
+]
+
+const receitas: dr[] = [
+  {
+    id: 1,
+    desc: 'salario',
+    value: 5000,
+    date: new Date('2020-01-01'),
+  },
+  { id: 2, desc: 'decimo 3', value: 11, date: new Date('2020-01-15') },
 ]
 
 export default function Financas() {
+  const [mesBusca, setMesBusca] = useState(0)
+  const currentDate = new Date()
+
+  const mes = navigationMes(currentDate.getMonth(), mesBusca)
+  console.log('mes:', mes)
+
+  const next = () => {
+    setMesBusca(mesBusca + 1)
+  }
+
+  const prev = () => {
+    console.log('cliecdo')
+    setMesBusca(mesBusca - 1)
+  }
+
+  const transacoes = [
+    ...despesas.map(despesa => ({
+      id: despesa.id,
+      desc: despesa.desc,
+      value: despesa.value,
+      date: despesa.date,
+      tipo: 'despesa',
+    })),
+    ...receitas.map(receita => ({
+      id: receita.id,
+      desc: receita.desc,
+      value: receita.value,
+      date: receita.date,
+      tipo: 'receita',
+    })),
+  ]
+
+  const transacoesby = transacoes.sort(
+    (a, b) => new Date(a.date).getTime() + new Date(b.date).getTime()
+  )
+
   return (
     <div>
       <div>
@@ -32,12 +88,12 @@ export default function Financas() {
           <div className="flex justify-between mt-2 gap-4">
             <div className="flex items-center w-full ">
               <Button type="button" variant={'destructive'} className="w-full">
-                <Label>PAY - 500,00</Label>
+                <Label>PAY 500,00</Label>
               </Button>
             </div>
             <div className="flex items-center w-full ">
               <Button type="button" className="w-full">
-                <Label>REC - 5000,00</Label>
+                <Label>REC 5000,00</Label>
               </Button>
             </div>
           </div>
@@ -50,9 +106,18 @@ export default function Financas() {
             </div>
           </div>
         </form>
-
-        <hr className="bg-red-800" />
-        <Table className=" ">
+        <hr className="bg-white" />
+        <div className="flex justify-between">
+          <Button onClick={() => prev()}>
+            <ChevronLeft />
+          </Button>
+          <div className="flex text-center items-center">{mes.name}</div>
+          <Button onClick={() => next()}>
+            <ChevronRight />
+          </Button>
+        </div>
+        <hr className="bg-white" />
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">date</TableHead>
@@ -61,9 +126,9 @@ export default function Financas() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transacoes.map((tra, index) => (
-              <TableRow key={tra.id}>
-                <TableCell>{tra.date}</TableCell>
+            {transacoesby.map((tra, index) => (
+              <TableRow key={Number(index)}>
+                <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell>
                 <TableCell>{tra.desc}</TableCell>
                 <TableCell className="text-end">{tra.value}</TableCell>
               </TableRow>
@@ -73,4 +138,27 @@ export default function Financas() {
       </div>
     </div>
   )
+}
+
+const monthNames = [
+  'JAN',
+  'FEV',
+  'MAR',
+  'ABR',
+  'MAI',
+  'JUN',
+  'JUL',
+  'AGO',
+  'SET',
+  'OUT',
+  'NOV',
+  'DEZ',
+]
+
+export const navigationMes = (currentMonthIndex: number, direction: number) => {
+  const newIndex =
+    (currentMonthIndex + direction + monthNames.length) % monthNames.length
+
+  return { name: monthNames[newIndex], index: newIndex + 1 }
+  // return newIndex
 }
