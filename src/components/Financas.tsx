@@ -48,7 +48,11 @@ export default function Financas() {
   const [mesBusca, setMesBusca] = useState(0)
   const currentDate = new Date()
 
-  const mes = navigationMes(currentDate.getMonth(), mesBusca)
+  const mes = navigationMes(
+    currentDate.getMonth(),
+    currentDate.getFullYear(),
+    mesBusca
+  )
   console.log('mes:', mes)
 
   const next = () => {
@@ -111,7 +115,13 @@ export default function Financas() {
           <Button onClick={() => prev()}>
             <ChevronLeft />
           </Button>
-          <div className="flex text-center items-center">{mes.name}</div>
+          <div
+            className="flex text-center items-center"
+            onClick={() => setMesBusca(0)}
+            onKeyDown={() => console.log('down')}
+          >
+            {mes.name} / {mes.year}
+          </div>
           <Button onClick={() => next()}>
             <ChevronRight />
           </Button>
@@ -155,10 +165,22 @@ const monthNames = [
   'DEZ',
 ]
 
-export const navigationMes = (currentMonthIndex: number, direction: number) => {
-  const newIndex =
+export const navigationMes = (
+  currentMonthIndex: number,
+  currentYear: number,
+  direction: number
+) => {
+  const newMonthIndex =
     (currentMonthIndex + direction + monthNames.length) % monthNames.length
 
-  return { name: monthNames[newIndex], index: newIndex + 1 }
+  const newYear =
+    currentYear +
+    Math.floor((currentMonthIndex + direction) / monthNames.length)
+
+  return {
+    index: newMonthIndex + 1,
+    name: monthNames[newMonthIndex],
+    year: newYear,
+  }
   // return newIndex
 }
