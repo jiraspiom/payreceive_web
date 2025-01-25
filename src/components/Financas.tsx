@@ -81,19 +81,7 @@ type TransationProps = {
 }
 
 export default function Financas() {
-  const [mesBusca, setMesBusca] = useState(0)
-
-  const cDate = new Date()
-  const mesuai = navigationMes(cDate.getMonth(), cDate.getFullYear(), mesBusca)
-
-  const next = () => {
-    setMesBusca(mesBusca + 1)
-  }
-
-  const prev = () => {
-    setMesBusca(mesBusca - 1)
-  }
-
+  // * busca de dados
   const transacoes = [
     ...despesas.map(despesa => ({
       id: despesa.id,
@@ -114,6 +102,17 @@ export default function Financas() {
   const transacoesby = transacoes.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime()
   })
+  // * fin da busca de dados
+
+  const [mesBusca, setMesBusca] = useState(0)
+  const cDate = new Date()
+  const mesAno = navigationMes(cDate.getMonth(), cDate.getFullYear(), mesBusca)
+  const next = () => {
+    setMesBusca(mesBusca + 1)
+  }
+  const prev = () => {
+    setMesBusca(mesBusca - 1)
+  }
 
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState<TransationProps | null>(null)
@@ -172,7 +171,7 @@ export default function Financas() {
           onClick={() => setMesBusca(0)}
           onKeyDown={() => {}}
         >
-          {mesuai.name} / {mesuai.year}
+          {mesAno.name} / {mesAno.year}
         </div>
         <Button onClick={() => next()}>
           <ChevronRight />
