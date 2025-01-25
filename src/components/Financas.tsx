@@ -24,6 +24,7 @@ import {
   DrawerFooter,
   DrawerClose,
 } from './ui/drawer'
+import { cn } from '@/lib/utils'
 
 type dr = {
   id: number
@@ -37,12 +38,80 @@ const despesas: dr[] = [
     id: 1,
     desc: 'primeiro carinha aqui que nao sei o que e',
     value: 55,
-    date: new Date('01/01/2020'),
+    date: new Date('2023-02-01T00:00:00.000Z'),
   },
-  { id: 2, desc: 'segundo', value: 11, date: new Date('2020-01-01') },
-  { id: 3, desc: 'terce', value: 1, date: new Date('2020-01-03') },
-  { id: 4, desc: 'terce', value: 31, date: new Date('2020-01-06') },
-  { id: 5, desc: 'salario', value: 500, date: new Date('2020-01-11') },
+  {
+    id: 2,
+    desc: 'segundo',
+    value: 11,
+    date: new Date('2020-01-01T00:00:00.000Z'),
+  },
+  {
+    id: 3,
+    desc: 'terce',
+    value: 1,
+    date: new Date('2020-01-03T00:00:00.000Z'),
+  },
+  {
+    id: 4,
+    desc: 'terce',
+    value: 31,
+    date: new Date('2020-01-06T00:00:00.000Z'),
+  },
+  {
+    id: 5,
+    desc: 'salario',
+    value: 500,
+    date: new Date('2020-06-11T00:00:00.000Z'),
+  },
+  {
+    id: 6,
+    desc: 'terce',
+    value: 31,
+    date: new Date('2020-01-06T00:00:00.000Z'),
+  },
+  {
+    id: 7,
+    desc: 'salario',
+    value: 500,
+    date: new Date('2020-01-11T00:00:00.000Z'),
+  },
+  {
+    id: 8,
+    desc: 'terce',
+    value: 31,
+    date: new Date('2020-01-06T00:00:00.000Z'),
+  },
+  {
+    id: 9,
+    desc: 'salario',
+    value: 500,
+    date: new Date('2020-01-11T00:00:00.000Z'),
+  },
+  {
+    id: 10,
+    desc: 'terce',
+    value: 31,
+    date: new Date('2020-01-06T00:00:00.000Z'),
+  },
+  {
+    id: 11,
+    desc: 'salario',
+    value: 500,
+    date: new Date('2020-01-11T00:00:00.000Z'),
+  },
+  {
+    id: 12,
+    desc: 'terce',
+    value: 31,
+    date: new Date('2020-01-06T00:00:00.000Z'),
+  },
+  {
+    id: 13,
+    desc: 'salario',
+    value: 500,
+    date: new Date('2022-01-11T00:00:00.000Z'),
+  },
 ]
 
 const receitas: dr[] = [
@@ -50,21 +119,29 @@ const receitas: dr[] = [
     id: 1,
     desc: 'salario',
     value: 5000,
-    date: new Date('2020-01-01'),
+    date: new Date('2020-01-01T00:00:00.000Z'),
   },
-  { id: 2, desc: 'decimo 3', value: 11, date: new Date('2020-01-15') },
+  {
+    id: 2,
+    desc: 'decimo 3',
+    value: 1100,
+    date: new Date('2023-01-15T00:00:00.000Z'),
+  },
 ]
+
+type TransationProps = {
+  id: number
+  desc: string
+  value: number
+  date: Date
+  tipo: string
+}
 
 export default function Financas() {
   const [mesBusca, setMesBusca] = useState(0)
-  const currentDate = new Date()
 
-  const mes = navigationMes(
-    currentDate.getMonth(),
-    currentDate.getFullYear(),
-    mesBusca
-  )
-  console.log('mes:', mes)
+  const cDate = new Date()
+  const mesuai = navigationMes(cDate.getMonth(), cDate.getFullYear(), mesBusca)
 
   const next = () => {
     setMesBusca(mesBusca + 1)
@@ -91,15 +168,15 @@ export default function Financas() {
     })),
   ]
 
-  const transacoesby = transacoes.sort(
-    (a, b) => new Date(a.date).getTime() + new Date(b.date).getTime()
-  )
+  const transacoesby = transacoes.sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime()
+  })
 
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedSale, setSelectedSale] = useState<number | null>(null)
+  const [selected, setSelected] = useState<TransationProps | null>(null)
 
-  const handleRowClick = (sale: number) => {
-    setSelectedSale(sale)
+  const handleRowClick = (transacao: TransationProps) => {
+    setSelected(transacao)
     setIsOpen(true)
   }
 
@@ -135,9 +212,9 @@ export default function Financas() {
         <div
           className="flex text-center items-center"
           onClick={() => setMesBusca(0)}
-          onKeyDown={() => console.log('down')}
+          onKeyDown={() => {}}
         >
-          {mes.name} / {mes.year}
+          {mesuai.name} / {mesuai.year}
         </div>
         <Button onClick={() => next()}>
           <ChevronRight />
@@ -147,7 +224,7 @@ export default function Financas() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-10">date</TableHead>
+            {/* <TableHead className="w-10">date</TableHead> */}
             <TableHead>desciption</TableHead>
             <TableHead>$</TableHead>
           </TableRow>
@@ -156,14 +233,24 @@ export default function Financas() {
           {transacoesby.map((tra, index) => (
             <TableRow
               key={Number(index)}
-              onClick={() => handleRowClick(index + 1)}
-              className={
-                'transition-transform duration-3001 cursor-pointer hover:bg-muted/50'
-              }
+              onClick={() => handleRowClick(tra)}
+              className={cn([
+                'transition-transform duration-3001 cursor-pointer hover:bg-muted/50',
+              ])}
             >
-              <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell>
-              <TableCell>{truncateText(tra.desc, 30)}</TableCell>
-              <TableCell className="text-end">{tra.value}</TableCell>
+              {/* <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell> */}
+              <TableCell>
+                <div className="text-xs">{format(tra.date, 'dd/MM/yyyy')}</div>
+                <div className="text-xl">{truncateText(tra.desc, 30)}</div>
+              </TableCell>
+              <TableCell
+                className={cn([
+                  'text-end',
+                  tra.tipo === 'receita' ? 'text-purple-500' : 'text-red-600',
+                ])}
+              >
+                {tra.tipo === 'receita' ? tra.value : `- ${tra.value}`}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -172,15 +259,20 @@ export default function Financas() {
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>Detalhes da Venda</DrawerTitle>
-            <DrawerDescription>
-              Informações detalhadas sobre a venda selecionada.
-            </DrawerDescription>
+            <DrawerTitle>Details of {selected?.tipo}</DrawerTitle>
+            <DrawerDescription>Information of pay and rec.</DrawerDescription>
           </DrawerHeader>
-          {selectedSale && (
+
+          {selected && (
             <div className="p-4 space-y-4">
               <p>
-                <strong>ID:</strong> {selectedSale}
+                <strong>ID:</strong> {selected.id}
+              </p>
+              <p>
+                <strong>des:</strong> {selected.desc}
+              </p>
+              <p>
+                <strong>value:</strong> {selected.value}
               </p>
             </div>
           )}
@@ -227,7 +319,6 @@ export const navigationMes = (
     name: monthNames[newMonthIndex],
     year: newYear,
   }
-  // return newIndex
 }
 
 function truncateText(text: string, maxLength: number): string {
