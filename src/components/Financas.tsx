@@ -25,113 +25,56 @@ import {
   DrawerClose,
 } from './ui/drawer'
 import { cn } from '@/lib/utils'
+import { salvarPayRec } from '@/app/actions/salvarPayRec'
 
 type dr = {
   id: number
-  desc: string
+  text: string
   value: number
   date: Date
+}
+
+interface PostData {
+  text: string
+  value: number
+}
+
+interface PostResponse {
+  id: number
+  title: string
+}
+
+interface ErrorResponse {
+  message: string
 }
 
 const despesas: dr[] = [
   {
     id: 1,
-    desc: 'primeiro carinha aqui que nao sei o que e',
+    text: 'primeiro carinha aqui que nao sei o que e',
     value: 55,
     date: new Date('2023-02-01T00:00:00.000Z'),
   },
   {
     id: 2,
-    desc: 'segundo',
+    text: 'segundo',
     value: 11,
     date: new Date('2020-01-01T00:00:00.000Z'),
-  },
-  {
-    id: 3,
-    desc: 'terce',
-    value: 1,
-    date: new Date('2020-01-03T00:00:00.000Z'),
-  },
-  {
-    id: 4,
-    desc: 'terce',
-    value: 31,
-    date: new Date('2020-01-06T00:00:00.000Z'),
-  },
-  {
-    id: 5,
-    desc: 'salario',
-    value: 500,
-    date: new Date('2020-06-11T00:00:00.000Z'),
-  },
-  {
-    id: 6,
-    desc: 'terce',
-    value: 31,
-    date: new Date('2020-01-06T00:00:00.000Z'),
-  },
-  {
-    id: 7,
-    desc: 'salario',
-    value: 500,
-    date: new Date('2020-01-11T00:00:00.000Z'),
-  },
-  {
-    id: 8,
-    desc: 'terce',
-    value: 31,
-    date: new Date('2020-01-06T00:00:00.000Z'),
-  },
-  {
-    id: 9,
-    desc: 'salario',
-    value: 500,
-    date: new Date('2020-01-11T00:00:00.000Z'),
-  },
-  {
-    id: 10,
-    desc: 'terce',
-    value: 31,
-    date: new Date('2020-01-06T00:00:00.000Z'),
-  },
-  {
-    id: 11,
-    desc: 'salario',
-    value: 500,
-    date: new Date('2020-01-11T00:00:00.000Z'),
-  },
-  {
-    id: 12,
-    desc: 'terce',
-    value: 31,
-    date: new Date('2020-01-06T00:00:00.000Z'),
-  },
-  {
-    id: 13,
-    desc: 'salario',
-    value: 500,
-    date: new Date('2022-01-11T00:00:00.000Z'),
   },
 ]
 
 const receitas: dr[] = [
   {
     id: 1,
-    desc: 'salario',
+    text: 'salario',
     value: 5000,
     date: new Date('2020-01-01T00:00:00.000Z'),
-  },
-  {
-    id: 2,
-    desc: 'decimo 3',
-    value: 1100,
-    date: new Date('2023-01-15T00:00:00.000Z'),
   },
 ]
 
 type TransationProps = {
   id: number
-  desc: string
+  text: string
   value: number
   date: Date
   tipo: string
@@ -154,14 +97,14 @@ export default function Financas() {
   const transacoes = [
     ...despesas.map(despesa => ({
       id: despesa.id,
-      desc: despesa.desc,
+      text: despesa.text,
       value: despesa.value,
       date: despesa.date,
       tipo: 'despesa',
     })),
     ...receitas.map(receita => ({
       id: receita.id,
-      desc: receita.desc,
+      text: receita.text,
       value: receita.value,
       date: receita.date,
       tipo: 'receita',
@@ -185,22 +128,37 @@ export default function Financas() {
       <form className="space-y-4 mb-6">
         <div className="flex justify-between mt-2 gap-4">
           <div className="flex items-center w-full ">
-            <Button type="button" variant={'destructive'} className="w-full">
+            <Button
+              type="button"
+              name="type"
+              onClick={() =>
+                salvarPayRec(new FormData(document.forms[0]), 'pay')
+              }
+              variant={'destructive'}
+              className="w-full"
+            >
               <Label>PAY 500,00</Label>
             </Button>
           </div>
           <div className="flex items-center w-full ">
-            <Button type="button" className="w-full">
+            <Button
+              type="button"
+              name="type"
+              onClick={() =>
+                salvarPayRec(new FormData(document.forms[0]), 'rec')
+              }
+              className="w-full"
+            >
               <Label>REC 5000,00</Label>
             </Button>
           </div>
         </div>
         <div className="flex gap-4">
           <div className="w-8/12">
-            <Input required placeholder="Description" />
+            <Input name="text" required placeholder="Description" />
           </div>
           <div className="w-4/12">
-            <Input required placeholder="value" />
+            <Input name="value" required placeholder="value" />
           </div>
         </div>
       </form>
@@ -241,7 +199,7 @@ export default function Financas() {
               {/* <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell> */}
               <TableCell>
                 <div className="text-xs">{format(tra.date, 'dd/MM/yyyy')}</div>
-                <div className="text-xl">{truncateText(tra.desc, 30)}</div>
+                <div className="text-xl">{truncateText(tra.text, 30)}</div>
               </TableCell>
               <TableCell
                 className={cn([
@@ -274,7 +232,7 @@ export default function Financas() {
                 <strong>ID:</strong> {selected.id}
               </p>
               <p>
-                <strong>des:</strong> {selected.desc}
+                <strong>des:</strong> {selected.text}
               </p>
               <p>
                 <strong>value:</strong> {selected.value}

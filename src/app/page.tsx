@@ -1,6 +1,22 @@
 import Financas from '@/components/Financas'
+import httpClientFetch from '@/http/client-fetch'
 
-export default function Home() {
+export default async function Home() {
+  const response = await httpClientFetch<{ data: string }, { message: string }>(
+    {
+      method: 'GET',
+      baseURL: 'https://payrec.vercel.app',
+      url: '/api/pay/payments',
+    }
+  )
+
+  const [error, data] = response
+
+  if (error) {
+    console.error('erro', error.message)
+  } else {
+    console.log('data', data?.data)
+  }
   return (
     <main className="container mx-auto p-2 ">
       <div className="flex justify-between">
