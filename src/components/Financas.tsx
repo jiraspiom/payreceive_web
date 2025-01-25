@@ -249,7 +249,12 @@ export default function Financas() {
                   tra.tipo === 'receita' ? 'text-purple-500' : 'text-red-600',
                 ])}
               >
-                {tra.tipo === 'receita' ? tra.value : `- ${tra.value}`}
+                {tra.tipo === 'receita'
+                  ? tra.value.toLocaleString('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    })
+                  : `- ${tra.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`}
               </TableCell>
             </TableRow>
           ))}
