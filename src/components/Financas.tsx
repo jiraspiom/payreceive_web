@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils'
 import { salvarPayRec } from '@/app/actions/salvarPayRec'
 
 type dr = {
-  id: number
+  id: string
   text: string
   value: number
   date: Date
@@ -50,22 +50,16 @@ interface ErrorResponse {
 
 const despesas: dr[] = [
   {
-    id: 1,
+    id: 'abc',
     text: 'primeiro carinha aqui que nao sei o que e',
     value: 55,
     date: new Date('2023-02-01T00:00:00.000Z'),
-  },
-  {
-    id: 2,
-    text: 'segundo',
-    value: 11,
-    date: new Date('2020-01-01T00:00:00.000Z'),
   },
 ]
 
 const receitas: dr[] = [
   {
-    id: 1,
+    id: '1',
     text: 'salario',
     value: 5000,
     date: new Date('2020-01-01T00:00:00.000Z'),
@@ -73,17 +67,26 @@ const receitas: dr[] = [
 ]
 
 type TransationProps = {
-  id: number
+  id: string
   text: string
   value: number
   date: Date
   tipo: string
 }
 
-export default function Financas() {
+type RetornoFetch = {
+  id: string
+  text: string
+  value: number
+  date: Date
+}
+
+export default function Financas({
+  dados,
+}: { dados: RetornoFetch[] | undefined }) {
   // * busca de dados
   const transacoes = [
-    ...despesas.map(despesa => ({
+    ...(dados ?? []).map(despesa => ({
       id: despesa.id,
       text: despesa.text,
       value: despesa.value,
@@ -187,31 +190,31 @@ export default function Financas() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {transacoesby.map((tra, index) => (
+          {transacoesby.map((pr, index) => (
             <TableRow
               key={Number(index)}
-              onClick={() => handleRowClick(tra)}
+              onClick={() => handleRowClick(pr)}
               className={cn([
                 'transition-transform duration-3001 cursor-pointer hover:bg-muted/50',
               ])}
             >
               {/* <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell> */}
               <TableCell>
-                <div className="text-xs">{format(tra.date, 'dd/MM/yyyy')}</div>
-                <div className="text-xl">{truncateText(tra.text, 30)}</div>
+                <div className="text-xs">{format(pr.date, 'dd/MM/yyyy')}</div>
+                <div className="text-xl">{truncateText(pr.text, 30)}</div>
               </TableCell>
               <TableCell
                 className={cn([
                   'text-end',
-                  tra.tipo === 'receita' ? 'text-purple-500' : 'text-red-600',
+                  pr.tipo === 'receita' ? 'text-purple-500' : 'text-red-600',
                 ])}
               >
-                {tra.tipo === 'receita'
-                  ? tra.value.toLocaleString('pt-BR', {
+                {pr.tipo === 'receita'
+                  ? pr.value.toLocaleString('pt-BR', {
                       style: 'currency',
                       currency: 'BRL',
                     })
-                  : `- ${tra.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`}
+                  : `- ${pr.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`}
               </TableCell>
             </TableRow>
           ))}
