@@ -28,6 +28,9 @@ import {
 import { cn } from '@/lib/utils'
 import { salvarPayRec } from '@/app/actions/salvarPayRec'
 import { DeletePayRec } from '@/app/actions/deletePayRec'
+import { useSearchParams, usePathname, useRouter } from 'next/navigation'
+import { useDebouncedCallback } from 'use-debounce'
+import { navigationMes } from '@/lib/navigationMes'
 
 type TransationProps = {
   id: string
@@ -51,6 +54,22 @@ export default function Financas({
   dadosPay: RetornoFetch[] | undefined
   dadosRec: RetornoFetch[] | undefined
 }) {
+  const searchParams = useSearchParams()
+  const { replace } = useRouter()
+  const pathname = usePathname()
+
+  const handleSearch = useDebouncedCallback((term: string) => {
+    const params = new URLSearchParams(searchParams)
+
+    if (term) {
+      params.set('query', term)
+    } else {
+      params.delete('query')
+    }
+
+    replace(`${pathname}?${params.toString()}`)
+  }, 0)
+
   const totalPay = dadosPay?.reduce((acc, pay) => acc + pay.value, 0) ?? 0
   const totalRec = dadosRec?.reduce((acc, rec) => acc + rec.value, 0) ?? 0
 
@@ -81,12 +100,28 @@ export default function Financas({
 
   const [mesBusca, setMesBusca] = useState(0)
   const cDate = new Date()
+
   const mesAno = navigationMes(cDate.getMonth(), cDate.getFullYear(), mesBusca)
+
   const next = () => {
+    const mesAno = navigationMes(
+      cDate.getMonth(),
+      cDate.getFullYear(),
+      mesBusca
+    )
+
     setMesBusca(mesBusca + 1)
+    handleSearch(`${mesAno.year}-${mesAno.index}`)
   }
   const prev = () => {
+    const mesAno = navigationMes(
+      cDate.getMonth(),
+      cDate.getFullYear(),
+      mesBusca
+    )
+
     setMesBusca(mesBusca - 1)
+    handleSearch(`${mesAno.year}-${mesAno.index}`)
   }
 
   const [isOpen, setIsOpen] = useState(false)
@@ -153,7 +188,7 @@ export default function Financas({
           onClick={() => setMesBusca(0)}
           onKeyDown={() => {}}
         >
-          {mesAno.name} / {mesAno.year}
+          {`${mesAno.name} / ${mesAno.year}`}
         </div>
         <Button onClick={() => next()}>
           <ChevronRight />
@@ -248,40 +283,6 @@ export default function Financas({
       </Drawer>
     </div>
   )
-}
-
-const monthNames = [
-  'JAN',
-  'FEV',
-  'MAR',
-  'ABR',
-  'MAI',
-  'JUN',
-  'JUL',
-  'AGO',
-  'SET',
-  'OUT',
-  'NOV',
-  'DEZ',
-]
-
-export const navigationMes = (
-  currentMonthIndex: number,
-  currentYear: number,
-  direction: number
-) => {
-  const newMonthIndex =
-    (currentMonthIndex + direction + monthNames.length) % monthNames.length
-
-  const newYear =
-    currentYear +
-    Math.floor((currentMonthIndex + direction) / monthNames.length)
-
-  return {
-    index: newMonthIndex + 1,
-    name: monthNames[newMonthIndex],
-    year: newYear,
-  }
 }
 
 function truncateText(text: string, maxLength: number): string {

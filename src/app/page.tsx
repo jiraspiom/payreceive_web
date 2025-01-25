@@ -1,5 +1,7 @@
 import Financas from '@/components/Financas'
 import httpClientFetch from '@/http/client-fetch'
+import { navigationMes } from '@/lib/navigationMes'
+import { Pragati_Narrow } from 'next/font/google'
 
 type RetornoFetch = {
   id: string
@@ -8,23 +10,37 @@ type RetornoFetch = {
   date: Date
 }
 
-export default async function Home() {
+interface SearchParamsProps {
+  searchParams?: Promise<{
+    query?: string
+    page?: string
+  }>
+}
+
+export default async function Home({ searchParams }: SearchParamsProps) {
+  const search = await searchParams
+  const query = search?.query ?? ''
+
+  const parametros = query.split('-')
+
+  console.log('parametros', Number(parametros[0]), Number(parametros[1]))
+
   const responsepay = await httpClientFetch<
     { data: RetornoFetch[] },
     { message: string }
   >({
     method: 'GET',
     baseURL: 'https://payrec.vercel.app',
-    url: '/api/pay/payments',
+    url: `/api/pay/payments?ano=${Number(parametros[0])}&mes=${Number(parametros[1])}`,
   })
 
   const [errorPay, dataPay] = responsepay
 
-  if (errorPay) {
-    console.error('erro', errorPay.message)
-  } else {
-    console.log('data', dataPay?.data)
-  }
+  // if (errorPay) {
+  //   console.error('erro', errorPay.message)
+  // } else {
+  //   console.log('data', dataPay?.data)
+  // }
 
   const responserec = await httpClientFetch<
     { data: RetornoFetch[] },
@@ -32,16 +48,16 @@ export default async function Home() {
   >({
     method: 'GET',
     baseURL: 'https://payrec.vercel.app',
-    url: '/api/rec/receives',
+    url: `/api/rec/receives?ano=${Number(parametros[0])}&mes=${Number(parametros[1])}`,
   })
 
   const [errorRec, dataRec] = responserec
 
-  if (errorRec) {
-    console.error('erro', errorRec.message)
-  } else {
-    console.log('data', dataRec?.data)
-  }
+  // if (errorRec) {
+  //   console.error('erro', errorRec.message)
+  // } else {
+  //   console.log('data', dataRec?.data)
+  // }
 
   return (
     <main className="container mx-auto p-2 ">
