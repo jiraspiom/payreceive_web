@@ -82,18 +82,22 @@ type RetornoFetch = {
 }
 
 export default function Financas({
-  dados,
-}: { dados: RetornoFetch[] | undefined }) {
+  dadosPay,
+  dadosRec,
+}: {
+  dadosPay: RetornoFetch[] | undefined
+  dadosRec: RetornoFetch[] | undefined
+}) {
   // * busca de dados
   const transacoes = [
-    ...(dados ?? []).map(despesa => ({
+    ...(dadosPay ?? []).map(despesa => ({
       id: despesa.id,
       text: despesa.text,
       value: despesa.value,
       date: despesa.date,
       tipo: 'despesa',
     })),
-    ...receitas.map(receita => ({
+    ...(dadosRec ?? []).map(receita => ({
       id: receita.id,
       text: receita.text,
       value: receita.value,

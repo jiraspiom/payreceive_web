@@ -9,7 +9,7 @@ type RetornoFetch = {
 }
 
 export default async function Home() {
-  const response = await httpClientFetch<
+  const responsepay = await httpClientFetch<
     { data: RetornoFetch[] },
     { message: string }
   >({
@@ -18,12 +18,29 @@ export default async function Home() {
     url: '/api/pay/payments',
   })
 
-  const [error, data] = response
+  const [errorPay, dataPay] = responsepay
 
-  if (error) {
-    console.error('erro', error.message)
+  if (errorPay) {
+    console.error('erro', errorPay.message)
   } else {
-    console.log('data', data?.data)
+    console.log('data', dataPay?.data)
+  }
+
+  const responserec = await httpClientFetch<
+    { data: RetornoFetch[] },
+    { message: string }
+  >({
+    method: 'GET',
+    baseURL: 'https://payrec.vercel.app',
+    url: '/api/rec/receives',
+  })
+
+  const [errorRec, dataRec] = responserec
+
+  if (errorRec) {
+    console.error('erro', errorRec.message)
+  } else {
+    console.log('data', dataRec?.data)
   }
 
   return (
@@ -32,7 +49,7 @@ export default async function Home() {
         <h1 className="text-2xl font-bold mb-2">PAY-REC</h1>
         <h1 className="text-2xl font-bold mb-2">beta25.1.24</h1>
       </div>
-      <Financas dados={data?.data} />
+      <Financas dadosPay={dataPay?.data} dadosRec={dataRec?.data} />
     </main>
   )
 }
