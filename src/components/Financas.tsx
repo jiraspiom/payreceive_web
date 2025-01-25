@@ -1,4 +1,5 @@
 'use client'
+
 import {
   Table,
   TableBody,
@@ -9,7 +10,7 @@ import {
 } from './ui/table'
 import { Label } from './ui/label'
 import { Button } from './ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Trash } from 'lucide-react'
 import { Input } from './ui/input'
 import { format } from 'date-fns'
 import type React from 'react'
@@ -26,45 +27,7 @@ import {
 } from './ui/drawer'
 import { cn } from '@/lib/utils'
 import { salvarPayRec } from '@/app/actions/salvarPayRec'
-
-type dr = {
-  id: string
-  text: string
-  value: number
-  date: Date
-}
-
-interface PostData {
-  text: string
-  value: number
-}
-
-interface PostResponse {
-  id: number
-  title: string
-}
-
-interface ErrorResponse {
-  message: string
-}
-
-const despesas: dr[] = [
-  {
-    id: 'abc',
-    text: 'primeiro carinha aqui que nao sei o que e',
-    value: 55,
-    date: new Date('2023-02-01T00:00:00.000Z'),
-  },
-]
-
-const receitas: dr[] = [
-  {
-    id: '1',
-    text: 'salario',
-    value: 5000,
-    date: new Date('2020-01-01T00:00:00.000Z'),
-  },
-]
+import { DeletePayRec } from '@/app/actions/deletePayRec'
 
 type TransationProps = {
   id: string
@@ -88,21 +51,24 @@ export default function Financas({
   dadosPay: RetornoFetch[] | undefined
   dadosRec: RetornoFetch[] | undefined
 }) {
+  const totalPay = dadosPay?.reduce((acc, pay) => acc + pay.value, 0) ?? 0
+  const totalRec = dadosRec?.reduce((acc, rec) => acc + rec.value, 0) ?? 0
+
   // * busca de dados
   const transacoes = [
-    ...(dadosPay ?? []).map(despesa => ({
-      id: despesa.id,
-      text: despesa.text,
-      value: despesa.value,
-      date: despesa.date,
-      tipo: 'despesa',
+    ...(dadosPay ?? []).map(pay => ({
+      id: pay.id,
+      text: pay.text,
+      value: pay.value,
+      date: pay.date,
+      tipo: 'pay',
     })),
-    ...(dadosRec ?? []).map(receita => ({
-      id: receita.id,
-      text: receita.text,
-      value: receita.value,
-      date: receita.date,
-      tipo: 'receita',
+    ...(dadosRec ?? []).map(rec => ({
+      id: rec.id,
+      text: rec.text,
+      value: rec.value,
+      date: rec.date,
+      tipo: 'rec',
     })),
   ]
 
@@ -110,6 +76,8 @@ export default function Financas({
     return new Date(b.date).getTime() - new Date(a.date).getTime()
   })
   // * fin da busca de dados
+
+  const [acao, setAcao] = useState('')
 
   const [mesBusca, setMesBusca] = useState(0)
   const cDate = new Date()
@@ -124,38 +92,45 @@ export default function Financas({
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState<TransationProps | null>(null)
 
-  const handleRowClick = (transacao: TransationProps) => {
-    setSelected(transacao)
-    setIsOpen(true)
+  // abrir drawer
+  const handleRowClick = async (transacao: TransationProps) => {
+    await setSelected(transacao)
+    await setIsOpen(true)
+  }
+
+  const enviar = async (formData: FormData) => {
+    await salvarPayRec(formData, acao)
   }
 
   return (
     <div>
-      <form className="space-y-4 mb-6">
+      <form action={enviar} className="space-y-4 mb-6">
         <div className="flex justify-between mt-2 gap-4">
           <div className="flex items-center w-full ">
             <Button
-              type="button"
-              name="type"
-              onClick={() =>
-                salvarPayRec(new FormData(document.forms[0]), 'pay')
-              }
+              type="submit"
+              value="pay"
+              onClick={() => setAcao('pay')}
+              // onClick={() =>
+              //   salvarPayRec(new FormData(document.forms[0]), 'pay')
+              // }
               variant={'destructive'}
               className="w-full"
             >
-              <Label>PAY 500,00</Label>
+              <Label>PAY {totalPay && totalPay}</Label>
             </Button>
           </div>
           <div className="flex items-center w-full ">
             <Button
-              type="button"
-              name="type"
-              onClick={() =>
-                salvarPayRec(new FormData(document.forms[0]), 'rec')
-              }
+              type="submit"
+              value="rec"
+              onClick={() => setAcao('rec')}
+              // onClick={() =>
+              //   salvarPayRec(new FormData(document.forms[0]), 'rec')
+              // }
               className="w-full"
             >
-              <Label>REC 5000,00</Label>
+              <Label>REC {totalRec && totalRec}</Label>
             </Button>
           </div>
         </div>
@@ -189,8 +164,8 @@ export default function Financas({
         <TableHeader>
           <TableRow>
             {/* <TableHead className="w-10">date</TableHead> */}
-            <TableHead>desciption</TableHead>
-            <TableHead>$</TableHead>
+            <TableHead className="w-2/3">desciption</TableHead>
+            <TableHead className="w-1/3 text-center">$</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -210,10 +185,10 @@ export default function Financas({
               <TableCell
                 className={cn([
                   'text-end',
-                  pr.tipo === 'receita' ? 'text-purple-500' : 'text-red-600',
+                  pr.tipo === 'rec' ? 'text-purple-500' : 'text-red-600',
                 ])}
               >
-                {pr.tipo === 'receita'
+                {pr.tipo === 'rec'
                   ? pr.value.toLocaleString('pt-BR', {
                       style: 'currency',
                       currency: 'BRL',
@@ -227,23 +202,42 @@ export default function Financas({
 
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Details of {selected?.tipo}</DrawerTitle>
-            <DrawerDescription>Information of pay and rec.</DrawerDescription>
-          </DrawerHeader>
-
           {selected && (
-            <div className="p-4 space-y-4">
-              <p>
-                <strong>ID:</strong> {selected.id}
-              </p>
-              <p>
-                <strong>des:</strong> {selected.text}
-              </p>
-              <p>
-                <strong>value:</strong> {selected.value}
-              </p>
-            </div>
+            <>
+              <DrawerHeader>
+                <DrawerTitle>Details of {selected?.tipo}</DrawerTitle>
+                <DrawerDescription>
+                  Edit or Delete your {selected?.tipo}.
+                </DrawerDescription>
+              </DrawerHeader>
+
+              <div className="p-4 space-y-4">
+                <div className="flex justify-between">
+                  <strong>Data:</strong>
+                  {format(selected.date, 'dd/MM/yyyy').toString()}
+                  <Button
+                    onClick={() => DeletePayRec(selected.id, selected.tipo)}
+                    variant={'destructive'}
+                  >
+                    <Trash />
+                  </Button>
+                </div>
+                <p>
+                  <strong>des:</strong> {selected.text}
+                </p>
+                <div className="flex justify-between">
+                  <div>
+                    <strong>value: </strong> {selected.value}
+                  </div>
+                  {/* <Button
+                    onClick={() => DeletePayRec(selected.id, selected.tipo)}
+                    variant={'secondary'}
+                  >
+                    <Pencil />
+                  </Button> */}
+                </div>
+              </div>
+            </>
           )}
           <DrawerFooter>
             <DrawerClose asChild>

@@ -1,3 +1,5 @@
+'use server'
+
 import httpClientFetch from '@/http/client-fetch'
 import { revalidatePath } from 'next/cache'
 
@@ -34,4 +36,5 @@ export async function salvarPayRec(formData: FormData, acao: string) {
       console.log('rec criado com sucesso')
     }
   }
+  revalidatePath('/')
 }
