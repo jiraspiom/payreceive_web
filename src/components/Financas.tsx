@@ -14,7 +14,7 @@ import { ChevronLeft, ChevronRight, Trash } from 'lucide-react'
 import { Input } from './ui/input'
 import { format } from 'date-fns'
 import type React from 'react'
-import { useActionState, useState } from 'react'
+import { useState } from 'react'
 
 import {
   Drawer,
@@ -28,110 +28,30 @@ import {
 import { cn } from '@/lib/utils'
 import { salvarPayRec } from '@/app/actions/salvarPayRec'
 import { DeletePayRec } from '@/app/actions/deletePayRec'
-import { useSearchParams, usePathname, useRouter } from 'next/navigation'
-import { useDebouncedCallback } from 'use-debounce'
-import { navigationMes } from '@/lib/navigationMes'
 import { useToast } from '@/hooks/use-toast'
 import { ToastAction } from '@radix-ui/react-toast'
+import type { RetornoFetch, RetornoGetDados } from '@/app/types/RetornoFetch'
+import { DatePickerWithRange } from './datapick'
 
-type TransationProps = {
-  id: string
-  text: string
-  value: number
-  date: Date
-  tipo: string
-}
-
-type RetornoFetch = {
-  id: string
-  text: string
-  value: number
-  date: Date
+interface FinancasProps {
+  dados: RetornoGetDados
+  onDateChange: (ano: number, mes: number) => void
+  isLoading: boolean
 }
 
 export default function Financas({
-  dadosPay,
-  dadosRec,
-}: {
-  dadosPay: RetornoFetch[] | undefined
-  dadosRec: RetornoFetch[] | undefined
-}) {
-  const searchParams = useSearchParams()
-  const { replace } = useRouter()
-  const pathname = usePathname()
+  dados,
+  onDateChange,
+  isLoading,
+}: FinancasProps) {
   const { toast } = useToast()
-
-  const handleSearch = useDebouncedCallback((term: string) => {
-    const params = new URLSearchParams(searchParams)
-
-    if (term) {
-      params.set('query', term)
-    } else {
-      params.delete('query')
-    }
-
-    replace(`${pathname}?${params.toString()}`)
-  }, 0)
-
-  const totalPay = dadosPay?.reduce((acc, pay) => acc + pay.value, 0) ?? 0
-  const totalRec = dadosRec?.reduce((acc, rec) => acc + rec.value, 0) ?? 0
-
-  // * busca de dados
-  const transacoes = [
-    ...(dadosPay ?? []).map(pay => ({
-      id: pay.id,
-      text: pay.text,
-      value: pay.value,
-      date: pay.date,
-      tipo: 'pay',
-    })),
-    ...(dadosRec ?? []).map(rec => ({
-      id: rec.id,
-      text: rec.text,
-      value: rec.value,
-      date: rec.date,
-      tipo: 'rec',
-    })),
-  ]
-
-  const transacoesby = transacoes.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime()
-  })
-  // * fin da busca de dados
-
   const [acao, setAcao] = useState('')
 
-  const [mesBusca, setMesBusca] = useState(0)
-  const cDate = new Date()
-
-  const mesAno = navigationMes(cDate.getMonth(), cDate.getFullYear(), mesBusca)
-
-  const next = () => {
-    const mesAno = navigationMes(
-      cDate.getMonth(),
-      cDate.getFullYear(),
-      mesBusca
-    )
-
-    setMesBusca(mesBusca + 1)
-    handleSearch(`${mesAno.year}-${mesAno.index}`)
-  }
-  const prev = () => {
-    const mesAno = navigationMes(
-      cDate.getMonth(),
-      cDate.getFullYear(),
-      mesBusca
-    )
-
-    setMesBusca(mesBusca - 1)
-    handleSearch(`${mesAno.year}-${mesAno.index}`)
-  }
-
   const [isOpen, setIsOpen] = useState(false)
-  const [selected, setSelected] = useState<TransationProps | null>(null)
+  const [selected, setSelected] = useState<RetornoFetch | null>(null)
 
   // abrir drawer
-  const handleRowClick = async (transacao: TransationProps) => {
+  const handleRowClick = async (transacao: RetornoFetch) => {
     await setSelected(transacao)
     await setIsOpen(true)
   }
@@ -207,7 +127,7 @@ export default function Financas({
               variant={'destructive'}
               className="w-full"
             >
-              <Label>PAY ${totalPay && totalPay}</Label>
+              <Label>PAY ${dados.totalPay && dados.totalPay}</Label>
             </Button>
           </div>
           <div className="flex items-center w-full ">
@@ -217,7 +137,7 @@ export default function Financas({
               onClick={() => setAcao('rec')}
               className="w-full"
             >
-              <Label>REC {totalRec && totalRec}</Label>
+              <Label>REC ${dados.totalRec && dados.totalRec}</Label>
             </Button>
           </div>
         </div>
@@ -244,32 +164,19 @@ export default function Financas({
       </form>
 
       <hr className="bg-white" />
-      <div className="flex justify-between">
-        <Button onClick={() => prev()}>
-          <ChevronLeft />
-        </Button>
-        <div
-          className="flex text-center items-center"
-          onClick={() => setMesBusca(0)}
-          onKeyDown={() => {}}
-        >
-          {`${mesAno.name} / ${mesAno.year}`}
-        </div>
-        <Button onClick={() => next()}>
-          <ChevronRight />
-        </Button>
-      </div>
+      <DatePickerWithRange onDateChange={onDateChange} />
+
       <hr className="bg-white" />
       <Table>
         <TableHeader>
           <TableRow>
             {/* <TableHead className="w-10">date</TableHead> */}
             <TableHead className="w-2/3">desciption</TableHead>
-            <TableHead className="w-1/3 text-center">$</TableHead>
+            {/* <TableHead className="w-1/3 text-center">$</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {transacoesby.map((pr, index) => (
+          {dados.retornoFetch.map((pr, index) => (
             <TableRow
               key={Number(index)}
               onClick={() => handleRowClick(pr)}
@@ -286,6 +193,7 @@ export default function Financas({
                 className={cn([
                   'text-end',
                   pr.tipo === 'rec' ? 'text-purple-500' : 'text-red-600',
+                  'w-2/3',
                 ])}
               >
                 {pr.tipo === 'rec'

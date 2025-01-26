@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { format, addMonths, subMonths } from 'date-fns'
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -37,21 +37,21 @@ export function DatePickerWithRange({
 
   React.useEffect(() => {
     onDateChange(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
-  }, [currentMonth]) // Added currentMonth to dependencies
+  }, [currentMonth])
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
+    <div className={cn('flex items-center justify-between gap-2', className)}>
+      <Button variant="default" size="icon" onClick={handlePreviousMonth}>
         <ChevronLeftIcon className="h-4 w-4" />
       </Button>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             id="date"
-            variant={'outline'}
+            variant={'ghost'}
             className={cn('w-[200px] justify-center text-center font-normal')}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            {/* <CalendarIcon className="mr-2 h-4 w-4" /> */}
             {format(currentMonth, 'yyyy / MMM').toUpperCase()}
           </Button>
         </PopoverTrigger>
@@ -61,7 +61,7 @@ export function DatePickerWithRange({
           </div>
         </PopoverContent>
       </Popover>
-      <Button variant="outline" size="icon" onClick={handleNextMonth}>
+      <Button variant="default" size="icon" onClick={handleNextMonth}>
         <ChevronRightIcon className="h-4 w-4" />
       </Button>
     </div>

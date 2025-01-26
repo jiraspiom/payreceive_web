@@ -1,61 +1,14 @@
-import Financas from '@/components/Financas'
-import httpClientFetch from '@/http/client-fetch'
+'use server'
 
-type RetornoFetch = {
-  id: string
-  text: string
-  value: number
-  date: Date
-}
+import { FinancasWrapper } from '@/components/financas-wrapper'
+import { getDados } from '@/lib/getDados'
 
-interface SearchParamsProps {
-  searchParams?: Promise<{
-    query?: string
-    page?: string
-  }>
-}
-
-export default async function Home({ searchParams }: SearchParamsProps) {
-  const search = await searchParams
-  const query = search?.query ?? ''
-
-  const parametros = query.split('-')
-
-  console.log('parametros', Number(parametros[0]), Number(parametros[1]))
-
-  const responsepay = await httpClientFetch<
-    { data: RetornoFetch[] },
-    { message: string }
-  >({
-    method: 'GET',
-    baseURL: 'https://payrec.vercel.app',
-    url: `/api/pay/payments?ano=${Number(parametros[0])}&mes=${Number(parametros[1])}`,
-  })
-
-  const [errorPay, dataPay] = responsepay
-
-  // if (errorPay) {
-  //   console.error('erro', errorPay.message)
-  // } else {
-  //   console.log('data', dataPay?.data)
-  // }
-
-  const responserec = await httpClientFetch<
-    { data: RetornoFetch[] },
-    { message: string }
-  >({
-    method: 'GET',
-    baseURL: 'https://payrec.vercel.app',
-    url: `/api/rec/receives?ano=${Number(parametros[0])}&mes=${Number(parametros[1])}`,
-  })
-
-  const [errorRec, dataRec] = responserec
-
-  // if (errorRec) {
-  //   console.error('erro', errorRec.message)
-  // } else {
-  //   console.log('data', dataRec?.data)
-  // }
+export default async function Home() {
+  const dataAtual = new Date()
+  const dadosIniciais = await getDados(
+    dataAtual.getFullYear(),
+    dataAtual.getMonth() + 1
+  )
 
   return (
     <main className="container mx-auto p-2  ">
@@ -63,7 +16,7 @@ export default async function Home({ searchParams }: SearchParamsProps) {
         <h1 className="text-2xl font-bold mb-2">PAY-REC</h1>
         <h1 className="text-2xl font-bold mb-2">beta25.1.24</h1>
       </div>
-      <Financas dadosPay={dataPay?.data} dadosRec={dataRec?.data} />
+      <FinancasWrapper getDados={getDados} dadosIniciais={dadosIniciais} />
     </main>
   )
 }

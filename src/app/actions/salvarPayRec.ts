@@ -38,13 +38,5 @@ export async function salvarPayRec(formData: FormData, acao: string) {
     throw new Error(`Erro ao criar ${acao}`)
   }
 
-  // if (err) {
-  // } else {
-  //   console.log(`${acao} criado com sucesso:`, data)
-  // }
-  // } catch (error) {
-  //   console.error(`Erro inesperado ao processar o ${acao}:`, error)
-  // }
-
   revalidatePath('/')
 }

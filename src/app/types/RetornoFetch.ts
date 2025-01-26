@@ -3,4 +3,11 @@ export type RetornoFetch = {
   text: string
   value: number
   date: Date
+  tipo: string
+}
+
+export type RetornoGetDados = {
+  retornoFetch: RetornoFetch[]
+  totalPay: number
+  totalRec: number
 }

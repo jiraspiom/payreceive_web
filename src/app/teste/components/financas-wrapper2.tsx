@@ -1,15 +1,15 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Financas } from './Financas'
-import type { RetornoFetch } from '@/app/types/RetornoFetch'
+import type { RetornoGetDados } from '@/app/types/RetornoFetch'
+import { Financas2 } from './Financas2'
 
 interface FinancasWrapperProps {
-  getDados: (ano: number, mes: number) => Promise<RetornoFetch[] | undefined>
-  dadosIniciais: RetornoFetch[] | undefined
+  getDados: (ano: number, mes: number) => Promise<RetornoGetDados>
+  dadosIniciais: RetornoGetDados
 }
 
-export function FinancasWrapper({
+export function FinancasWrapper2({
   getDados,
   dadosIniciais,
 }: FinancasWrapperProps) {
@@ -29,7 +29,7 @@ export function FinancasWrapper({
   }
 
   return (
-    <Financas
+    <Financas2
       dados={dados}
       onDateChange={atualizarDados}
       isLoading={isLoading}
