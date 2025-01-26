@@ -170,46 +170,52 @@ export default function Financas({
       <DatePickerWithRange onDateChange={onDateChange} />
 
       <hr className="bg-white" />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {/* <TableHead className="w-10">date</TableHead> */}
-            <TableHead className="w-2/3" />
-            {/* <TableHead className="w-1/3 text-center">$</TableHead> */}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {dados.retornoFetch.map((pr, index) => (
-            <TableRow
-              key={Number(index)}
-              onClick={() => handleRowClick(pr)}
-              className={cn([
-                'transition-transform duration-3001 cursor-pointer hover:bg-muted/50',
-              ])}
-            >
-              {/* <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell> */}
-              <TableCell className=" w-2/3">
-                <div className="text-xs">{format(pr.date, 'dd/MM/yyyy')}</div>
-                <div className="text-xl">{truncateText(pr.text, 30)}</div>
-              </TableCell>
-              <TableCell
+      {isLoading ? (
+        <div className="flex justify-center items-center text-center animate-ping">
+          ...
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {/* <TableHead className="w-10">date</TableHead> */}
+              <TableHead className="w-2/3" />
+              {/* <TableHead className="w-1/3 text-center">$</TableHead> */}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dados.retornoFetch.map((pr, index) => (
+              <TableRow
+                key={Number(index)}
+                onClick={() => handleRowClick(pr)}
                 className={cn([
-                  'text-end',
-                  pr.tipo === 'rec' ? 'text-purple-500' : 'text-red-600',
-                  'w-1/3 ',
+                  'transition-transform duration-3001 cursor-pointer hover:bg-muted/50',
                 ])}
               >
-                {pr.tipo === 'rec'
-                  ? pr.value.toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                    })
-                  : `- ${pr.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                {/* <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell> */}
+                <TableCell className=" w-2/3">
+                  <div className="text-xs">{format(pr.date, 'dd/MM/yyyy')}</div>
+                  <div className="text-xl">{truncateText(pr.text, 30)}</div>
+                </TableCell>
+                <TableCell
+                  className={cn([
+                    'text-end',
+                    pr.tipo === 'rec' ? 'text-purple-500' : 'text-red-600',
+                    'w-1/3 ',
+                  ])}
+                >
+                  {pr.tipo === 'rec'
+                    ? pr.value.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      })
+                    : `- ${pr.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerContent>
