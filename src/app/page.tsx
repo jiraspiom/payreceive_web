@@ -58,7 +58,7 @@ export default async function Home({ searchParams }: SearchParamsProps) {
   // }
 
   return (
-    <main className="container mx-auto p-2 ">
+    <main className="container mx-auto p-2  ">
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold mb-2">PAY-REC</h1>
         <h1 className="text-2xl font-bold mb-2">beta25.1.24</h1>

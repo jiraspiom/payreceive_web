@@ -4,21 +4,35 @@ import httpClientFetch from '@/http/client-fetch'
 import { revalidatePath } from 'next/cache'
 
 export async function DeletePayRec(id: string, tipo: string) {
-  const acao =
-    tipo === 'pay' ? `/api/pay/payments/${id}` : `/api/rec/receives/${id}`
+  const endpoints: Record<string, string> = {
+    pay: `/api/pay/payments/${id}`,
+    rec: `/api/rec/receives/${id}`,
+  }
 
-  console.log('ok acai', acao, id)
+  const endpoint = endpoints[tipo]
 
-  const [err, data] = await httpClientFetch({
+  console.log('endpoint', endpoint)
+
+  if (!endpoint) {
+    console.error(`Açao ${tipo} não é válida`)
+    throw new Error(`Ação ${tipo} inválida.`)
+    // return
+  }
+
+  const [err] = await httpClientFetch({
     baseURL: 'https://payrec.vercel.app',
-    url: acao,
+    url: endpoint,
     method: 'DELETE',
   })
 
   if (err) {
-    console.log('Erro ao deletar payrec')
-  } else {
-    console.log('payrec deletado com sucesso')
+    console.error('Erro ao deletar payrec:', err)
+    throw new Error(`Erro ao deletar ${tipo}.`)
   }
+
+  console.log(
+    `${tipo === 'pay' ? 'Pagamento' : 'Recebimento'} deletado com sucesso!`
+  )
+
   revalidatePath('/')
 }

@@ -32,6 +32,7 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { navigationMes } from '@/lib/navigationMes'
 import { useToast } from '@/hooks/use-toast'
+import { ToastAction } from '@radix-ui/react-toast'
 
 type TransationProps = {
   id: string
@@ -135,7 +136,7 @@ export default function Financas({
     await setIsOpen(true)
   }
 
-  const enviar = async (formData: FormData) => {
+  const handleEnviar = async (formData: FormData) => {
     try {
       await salvarPayRec(formData, acao)
 
@@ -160,9 +161,43 @@ export default function Financas({
     }
   }
 
+  const handleDelete = async (id: string, tipo: string) => {
+    try {
+      await DeletePayRec(id, tipo)
+
+      toast({
+        title: 'Deleted',
+        description: 'Transaction deleted successfully',
+        variant: 'secondary',
+        action: (
+          <ToastAction
+            onClick={() => console.log('deletando')}
+            altText="Desfazer delete"
+          >
+            Undo
+          </ToastAction>
+        ),
+      })
+    } catch (error) {
+      if (error instanceof Error) {
+        toast({
+          title: 'Erro',
+          description: `Erro ao deletar ${tipo} ${error.message}`,
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Erro',
+          description: `Erro ao deletar ${tipo}`,
+          variant: 'destructive',
+        })
+      }
+    }
+  }
+
   return (
     <div>
-      <form action={enviar} className="space-y-4 mb-6">
+      <form action={handleEnviar} className="space-y-4 mb-6">
         <div className="flex justify-between mt-2 gap-4">
           <div className="flex items-center w-full ">
             <Button
@@ -273,12 +308,14 @@ export default function Financas({
                 <div className="flex justify-between">
                   <strong>Data:</strong>
                   {format(selected.date, 'dd/MM/yyyy').toString()}
-                  <Button
-                    onClick={() => DeletePayRec(selected.id, selected.tipo)}
-                    variant={'destructive'}
-                  >
-                    <Trash />
-                  </Button>
+                  <DrawerClose asChild>
+                    <Button
+                      onClick={() => handleDelete(selected.id, selected.tipo)}
+                      variant={'destructive'}
+                    >
+                      <Trash />
+                    </Button>
+                  </DrawerClose>
                 </div>
                 <p>
                   <strong>des:</strong> {selected.text}
