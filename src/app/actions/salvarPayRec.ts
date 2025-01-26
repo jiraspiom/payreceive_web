@@ -39,4 +39,5 @@ export async function salvarPayRec(formData: FormData, acao: string) {
   }
 
   revalidatePath('/')
+  revalidatePath('/teste')
 }

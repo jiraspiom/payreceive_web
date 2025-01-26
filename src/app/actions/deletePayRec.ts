@@ -35,4 +35,5 @@ export async function DeletePayRec(id: string, tipo: string) {
   )
 
   revalidatePath('/')
+  revalidatePath('/teste')
 }
