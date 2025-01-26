@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import { format, addMonths, subMonths } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 
@@ -11,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import React, { useEffect } from 'react'
 
 interface DatePickerWithRangeProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -35,7 +35,7 @@ export function DatePickerWithRange({
     onDateChange(newDate.getFullYear(), newDate.getMonth() + 1)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     onDateChange(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
   }, [currentMonth])
 

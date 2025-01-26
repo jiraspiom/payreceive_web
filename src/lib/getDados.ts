@@ -27,7 +27,6 @@ export async function getDados(
   })
 
   const [errorRec, dataRec] = responserec
-  console.log('erros', errorPay, errorRec)
 
   const totalPay = dataPay?.data.reduce((acc, pay) => acc + pay.value, 0) ?? 0
   const totalRec = dataRec?.data.reduce((acc, rec) => acc + rec.value, 0) ?? 0
@@ -53,6 +52,7 @@ export async function getDados(
     return new Date(b.date).getTime() - new Date(a.date).getTime()
   })
 
+  console.log('passou na busca buscada...')
   return { retornoFetch: transacoesby, totalPay, totalRec }
 }
 

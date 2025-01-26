@@ -10,7 +10,7 @@ import {
 } from './ui/table'
 import { Label } from './ui/label'
 import { Button } from './ui/button'
-import { ChevronLeft, ChevronRight, Trash } from 'lucide-react'
+import { Trash } from 'lucide-react'
 import { Input } from './ui/input'
 import { format } from 'date-fns'
 import type React from 'react'
@@ -32,6 +32,8 @@ import { useToast } from '@/hooks/use-toast'
 import { ToastAction } from '@radix-ui/react-toast'
 import type { RetornoFetch, RetornoGetDados } from '@/app/types/RetornoFetch'
 import { DatePickerWithRange } from './datapick'
+import { truncateText } from '@/lib/truncateText'
+import style from 'styled-jsx/style'
 
 interface FinancasProps {
   dados: RetornoGetDados
@@ -171,7 +173,7 @@ export default function Financas({
         <TableHeader>
           <TableRow>
             {/* <TableHead className="w-10">date</TableHead> */}
-            <TableHead className="w-2/3">desciption</TableHead>
+            <TableHead className="w-2/3" />
             {/* <TableHead className="w-1/3 text-center">$</TableHead> */}
           </TableRow>
         </TableHeader>
@@ -185,7 +187,7 @@ export default function Financas({
               ])}
             >
               {/* <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell> */}
-              <TableCell>
+              <TableCell className=" w-2/3">
                 <div className="text-xs">{format(pr.date, 'dd/MM/yyyy')}</div>
                 <div className="text-xl">{truncateText(pr.text, 30)}</div>
               </TableCell>
@@ -193,15 +195,15 @@ export default function Financas({
                 className={cn([
                   'text-end',
                   pr.tipo === 'rec' ? 'text-purple-500' : 'text-red-600',
-                  'w-2/3',
+                  'w-1/3 ',
                 ])}
               >
                 {pr.tipo === 'rec'
-                  ? pr.value.toLocaleString('pt-BR', {
+                  ? pr.value.toLocaleString('en-US', {
                       style: 'currency',
-                      currency: 'BRL',
+                      currency: 'USD',
                     })
-                  : `- ${pr.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`}
+                  : `- ${pr.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`}
               </TableCell>
             </TableRow>
           ))}
@@ -258,13 +260,6 @@ export default function Financas({
       </Drawer>
     </div>
   )
-}
-
-function truncateText(text: string, maxLength: number): string {
-  if (text.length > maxLength) {
-    return `${text.slice(0, maxLength)} ...`
-  }
-  return text
 }
 
 // draggable
