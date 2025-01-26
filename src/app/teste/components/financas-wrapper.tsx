@@ -2,17 +2,11 @@
 
 import React, { useState } from 'react'
 import { Financas } from './Financas'
-
-interface FinancaItem {
-  id: number
-  descricao: string
-  valor: number
-  data: string
-}
+import type { RetornoFetch } from '@/app/types/RetornoFetch'
 
 interface FinancasWrapperProps {
-  getDados: (ano: number, mes: number) => Promise<FinancaItem[]>
-  dadosIniciais: FinancaItem[]
+  getDados: (ano: number, mes: number) => Promise<RetornoFetch[] | undefined>
+  dadosIniciais: RetornoFetch[] | undefined
 }
 
 export function FinancasWrapper({

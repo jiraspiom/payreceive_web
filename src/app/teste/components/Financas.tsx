@@ -10,16 +10,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DatePickerWithRange } from './datapick'
-
-interface FinancaItem {
-  id: number
-  descricao: string
-  valor: number
-  data: string
-}
+import type { RetornoFetch } from '@/app/types/RetornoFetch'
 
 interface FinancasProps {
-  dados: FinancaItem[]
+  dados: RetornoFetch[] | undefined
   onDateChange: (ano: number, mes: number) => void
   isLoading: boolean
 }
@@ -40,12 +34,12 @@ export function Financas({ dados, onDateChange, isLoading }: FinancasProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {dados.map(item => (
+            {dados?.map(item => (
               <TableRow key={item.id}>
-                <TableCell>{item.descricao}</TableCell>
-                <TableCell>{item.valor.toFixed(2)}</TableCell>
+                <TableCell>{item.text}</TableCell>
+                <TableCell>{item.value.toFixed(2)}</TableCell>
                 <TableCell>
-                  {new Date(item.data).toLocaleDateString()}
+                  {new Date(item.date).toLocaleDateString()}
                 </TableCell>
               </TableRow>
             ))}
