@@ -35,9 +35,9 @@ export function DatePickerWithRange2({
     onDateChange(newDate.getFullYear(), newDate.getMonth() + 1)
   }
 
-  React.useEffect(() => {
-    onDateChange(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
-  }, [currentMonth])
+  // React.useEffect(() => {
+  //   onDateChange(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+  // }, [currentMonth])
 
   return (
     <div className={cn('flex items-center justify-between gap-2', className)}>
