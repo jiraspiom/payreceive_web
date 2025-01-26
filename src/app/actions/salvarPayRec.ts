@@ -7,34 +7,44 @@ export async function salvarPayRec(formData: FormData, acao: string) {
   const text = formData.get('text')
   const value = formData.get('value')
 
-  if (acao === 'pay') {
-    const [err, data] = await httpClientFetch({
-      baseURL: 'https://payrec.vercel.app',
-      url: '/api/pay/payments',
-      method: 'POST',
-      data: { text: text, value: Number(value) },
-    })
-
-    if (err) {
-      console.log('Erro ao criar o pay')
-    } else {
-      console.log('pay criado com sucesso')
-    }
+  if (!text || !value || Number.isNaN(Number(value))) {
+    console.error('Erro ao salvar o pay/rec')
+    throw new Error('Dados inválidos fornecidos.')
+    // return
   }
 
-  if (acao === 'rec') {
-    const [err, data] = await httpClientFetch({
-      baseURL: 'https://payrec.vercel.app',
-      url: '/api/rec/receives',
-      method: 'POST',
-      data: { text: text, value: Number(value) },
-    })
-
-    if (err) {
-      console.log('Erro ao criar o rec')
-    } else {
-      console.log('rec criado com sucesso')
-    }
+  const endpoints: Record<string, string> = {
+    pay: '/api/pay/payments',
+    rec: '/api/rec/receives',
   }
+
+  const endpoint = endpoints[acao]
+  if (!endpoint) {
+    console.error(`Açao ${acao} não é válida`)
+    throw new Error(`Ação ${acao} inválida.`)
+    // return
+  }
+
+  // try {
+  const [err] = await httpClientFetch({
+    baseURL: 'https://payrec.vercel.app',
+    url: endpoint,
+    method: 'POST',
+    data: { text: text, value: Number(value) },
+  })
+
+  if (err) {
+    console.error(`Erro ao criar o ${acao}:`, err)
+    throw new Error(`Erro ao criar ${acao}`)
+  }
+
+  // if (err) {
+  // } else {
+  //   console.log(`${acao} criado com sucesso:`, data)
+  // }
+  // } catch (error) {
+  //   console.error(`Erro inesperado ao processar o ${acao}:`, error)
+  // }
+
   revalidatePath('/')
 }

@@ -1,7 +1,5 @@
 import Financas from '@/components/Financas'
 import httpClientFetch from '@/http/client-fetch'
-import { navigationMes } from '@/lib/navigationMes'
-import { Pragati_Narrow } from 'next/font/google'
 
 type RetornoFetch = {
   id: string

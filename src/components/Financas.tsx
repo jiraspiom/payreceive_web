@@ -31,6 +31,7 @@ import { DeletePayRec } from '@/app/actions/deletePayRec'
 import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { navigationMes } from '@/lib/navigationMes'
+import { useToast } from '@/hooks/use-toast'
 
 type TransationProps = {
   id: string
@@ -57,6 +58,7 @@ export default function Financas({
   const searchParams = useSearchParams()
   const { replace } = useRouter()
   const pathname = usePathname()
+  const { toast } = useToast()
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams)
@@ -134,7 +136,28 @@ export default function Financas({
   }
 
   const enviar = async (formData: FormData) => {
-    await salvarPayRec(formData, acao)
+    try {
+      await salvarPayRec(formData, acao)
+
+      toast({
+        title: 'Success',
+        description: 'Transaction saved successfully',
+      })
+    } catch (error) {
+      if (error instanceof Error) {
+        toast({
+          title: 'Erro',
+          description: `Erro ao salvar ${acao} ${error.message}`,
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Erro',
+          description: `Erro ao salvar ${acao}`,
+          variant: 'destructive',
+        })
+      }
+    }
   }
 
   return (
