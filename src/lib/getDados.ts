@@ -1,61 +1,120 @@
 'use server'
 import type { RetornoFetch, RetornoGetDados } from '@/app/types/RetornoFetch'
 import httpClientFetch from '@/http/client-fetch'
-import { revalidatePath } from 'next/cache'
 
 export async function getDados(
   ano: number,
   mes: number
 ): Promise<RetornoGetDados> {
-  const responsepay = await httpClientFetch<
-    { data: RetornoFetch[] },
-    { message: string }
-  >({
-    method: 'GET',
-    baseURL: 'https://payrec.vercel.app',
-    url: `/api/pay/payments?ano=${Number(ano)}&mes=${Number(mes)}`,
-  })
+  const baseUrl = 'https://payrec.vercel.app'
 
-  const [errorPay, dataPay] = responsepay
+  // Fetch pagamentos e recebimentos com tipagem explícita
+  const payResult = await fetchData<RetornoFetch[]>(
+    baseUrl,
+    '/api/pay/payments',
+    ano,
+    mes
+  )
 
-  const responserec = await httpClientFetch<
-    { data: RetornoFetch[] },
-    { message: string }
-  >({
-    method: 'GET',
-    baseURL: 'https://payrec.vercel.app',
-    url: `/api/rec/receives?ano=${ano}&mes=${mes}`,
-  })
+  const recResult = await fetchData<RetornoFetch[]>(
+    baseUrl,
+    '/api/rec/receives',
+    ano,
+    mes
+  )
 
-  const [errorRec, dataRec] = responserec
+  // Calcula totais
+  const totalPay = payResult.data?.reduce((acc, pay) => acc + pay.value, 0) ?? 0
+  const totalRec = recResult.data?.reduce((acc, rec) => acc + rec.value, 0) ?? 0
 
-  const totalPay = dataPay?.data.reduce((acc, pay) => acc + pay.value, 0) ?? 0
-  const totalRec = dataRec?.data.reduce((acc, rec) => acc + rec.value, 0) ?? 0
-
+  // Junta e transforma as transações
   const transacoes = [
-    ...(dataPay?.data ?? []).map(pay => ({
-      id: pay.id,
-      text: pay.text,
-      value: pay.value,
-      date: pay.date,
-      tipo: 'pay',
-    })),
-    ...(dataRec?.data ?? []).map(rec => ({
-      id: rec.id,
-      text: rec.text,
-      value: rec.value,
-      date: rec.date,
-      tipo: 'rec',
-    })),
+    ...(payResult.data ?? []).map(pay => ({ ...pay, tipo: 'pay' as const })),
+    ...(recResult.data ?? []).map(rec => ({ ...rec, tipo: 'rec' as const })),
   ]
 
-  const transacoesby = transacoes.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime()
+  // Ordena as transações por data (descendente)
+  const transacoesOrdenadas = transacoes.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
+  console.log('Busca concluída com sucesso.')
+
+  return { retornoFetch: transacoesOrdenadas, totalPay, totalRec }
+
+  // const responsepay = await httpClientFetch<
+  //   { data: RetornoFetch[] },
+  //   { message: string }
+  // >({
+  //   method: 'GET',
+  //   baseURL: 'https://payrec.vercel.app',
+  //   url: `/api/pay/payments?ano=${Number(ano)}&mes=${Number(mes)}`,
+  // })
+
+  // const [errorPay, dataPay] = responsepay
+
+  // const responserec = await httpClientFetch<
+  //   { data: RetornoFetch[] },
+  //   { message: string }
+  // >({
+  //   method: 'GET',
+  //   baseURL: 'https://payrec.vercel.app',
+  //   url: `/api/rec/receives?ano=${ano}&mes=${mes}`,
+  // })
+
+  // const [errorRec, dataRec] = responserec
+
+  // const totalPay = dataPay?.data.reduce((acc, pay) => acc + pay.value, 0) ?? 0
+  // const totalRec = dataRec?.data.reduce((acc, rec) => acc + rec.value, 0) ?? 0
+
+  // const transacoes = [
+  //   ...(dataPay?.data ?? []).map(pay => ({
+  //     id: pay.id,
+  //     text: pay.text,
+  //     value: pay.value,
+  //     date: pay.date,
+  //     tipo: 'pay',
+  //   })),
+  //   ...(dataRec?.data ?? []).map(rec => ({
+  //     id: rec.id,
+  //     text: rec.text,
+  //     value: rec.value,
+  //     date: rec.date,
+  //     tipo: 'rec',
+  //   })),
+  // ]
+
+  // const transacoesby = transacoes.sort((a, b) => {
+  //   return new Date(b.date).getTime() - new Date(a.date).getTime()
+  // })
+
+  // console.log('passou na busca buscada...')
+
+  // return { retornoFetch: transacoesby, totalPay, totalRec }
+}
+
+// Função para buscar dados genéricos com tipagem explícita
+async function fetchData<T>(
+  baseUrl: string,
+  endpoint: string,
+  ano: number,
+  mes: number
+): Promise<{ error: Error | null; data: T | null }> {
+  // busca o fetch customisado
+  const [error, responseData] = await httpClientFetch<
+    { data: T },
+    { message: string }
+  >({
+    method: 'GET',
+    baseURL: baseUrl,
+    url: `${endpoint}?ano=${ano}&mes=${mes}`,
   })
 
-  console.log('passou na busca buscada...')
+  if (error) {
+    return { error: new Error(error.message), data: null }
+  }
 
-  return { retornoFetch: transacoesby, totalPay, totalRec }
+  return { error: null, data: responseData?.data || null }
 }
 
 // export async function getDados2(ano: number, mes: number) {
