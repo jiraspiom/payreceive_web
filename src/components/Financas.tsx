@@ -14,7 +14,7 @@ import { ChevronLeft, ChevronRight, Trash } from 'lucide-react'
 import { Input } from './ui/input'
 import { format } from 'date-fns'
 import type React from 'react'
-import { useState } from 'react'
+import { useActionState, useState } from 'react'
 
 import {
   Drawer,
@@ -204,13 +204,10 @@ export default function Financas({
               type="submit"
               value="pay"
               onClick={() => setAcao('pay')}
-              // onClick={() =>
-              //   salvarPayRec(new FormData(document.forms[0]), 'pay')
-              // }
               variant={'destructive'}
               className="w-full"
             >
-              <Label>PAY {totalPay && totalPay}</Label>
+              <Label>PAY ${totalPay && totalPay}</Label>
             </Button>
           </div>
           <div className="flex items-center w-full ">
@@ -218,9 +215,6 @@ export default function Financas({
               type="submit"
               value="rec"
               onClick={() => setAcao('rec')}
-              // onClick={() =>
-              //   salvarPayRec(new FormData(document.forms[0]), 'rec')
-              // }
               className="w-full"
             >
               <Label>REC {totalRec && totalRec}</Label>
@@ -229,13 +223,26 @@ export default function Financas({
         </div>
         <div className="flex gap-4">
           <div className="w-8/12">
-            <Input name="text" required placeholder="Description" />
+            <Input
+              name="text"
+              type="text"
+              maxLength={50}
+              required
+              placeholder="Description"
+            />
           </div>
           <div className="w-4/12">
-            <Input name="value" required placeholder="value" />
+            <Input
+              name="value"
+              type="number"
+              maxLength={12}
+              required
+              placeholder="$$$"
+            />
           </div>
         </div>
       </form>
+
       <hr className="bg-white" />
       <div className="flex justify-between">
         <Button onClick={() => prev()}>
