@@ -1,6 +1,7 @@
 'use server'
 import type { RetornoFetch, RetornoGetDados } from '@/app/types/RetornoFetch'
 import httpClientFetch from '@/http/client-fetch'
+import { revalidatePath } from 'next/cache'
 
 export async function getDados(
   ano: number,
@@ -53,6 +54,7 @@ export async function getDados(
   })
 
   console.log('passou na busca buscada...')
+
   return { retornoFetch: transacoesby, totalPay, totalRec }
 }
 

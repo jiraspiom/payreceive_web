@@ -20,6 +20,7 @@ export function FinancasWrapper({
     setIsLoading(true)
     try {
       const novosDados = await getDados(ano, mes)
+
       setDados(novosDados)
     } catch (error) {
       console.error('Erro ao buscar dados:', error)

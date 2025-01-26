@@ -33,7 +33,8 @@ import { ToastAction } from '@radix-ui/react-toast'
 import type { RetornoFetch, RetornoGetDados } from '@/app/types/RetornoFetch'
 import { DatePickerWithRange } from './datapick'
 import { truncateText } from '@/lib/truncateText'
-import style from 'styled-jsx/style'
+import { useRouter } from 'next/navigation'
+import router from 'next/router'
 
 interface FinancasProps {
   dados: RetornoGetDados
