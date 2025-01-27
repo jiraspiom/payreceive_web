@@ -1,22 +1,18 @@
 'use client'
 
 import React, { useState } from 'react'
-import type { RetornoGetDados } from '@/app/types/RetornoFetch'
+import type { DadosFinanceiros } from '@/app/types/RetornoFetch'
 import Financas from './Financas'
-import { getDados } from '@/lib/getDados'
-import { revalidatePath } from 'next/cache'
 
 interface FinancasWrapperProps {
-  getDados: (ano: number, mes: number) => Promise<RetornoGetDados>
-  dadosIniciais: RetornoGetDados
+  getDados: (ano: number, mes: number) => Promise<DadosFinanceiros>
+  dadosIniciais: DadosFinanceiros
 }
 
-interface FinancasWrapperProps2 {
-  dadosIniciais: RetornoGetDados
-}
-
-export function FinancasWrapper({ dadosIniciais }: FinancasWrapperProps2) {
-  console.log('verificando', dadosIniciais.totalPay)
+export function FinancasWrapper({
+  getDados,
+  dadosIniciais,
+}: FinancasWrapperProps) {
   const [dados, setDados] = useState(dadosIniciais)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -26,7 +22,6 @@ export function FinancasWrapper({ dadosIniciais }: FinancasWrapperProps2) {
       const novosDados = await getDados(ano, mes)
 
       setDados(novosDados)
-      revalidatePath('/')
     } catch (error) {
       console.error('Erro ao buscar dados:', error)
     } finally {
@@ -34,12 +29,12 @@ export function FinancasWrapper({ dadosIniciais }: FinancasWrapperProps2) {
     }
   }
 
-  console.log('dadoooooo', dados.totalPay)
-
   return (
     <div>
       <Financas
-        dados={dados}
+        dados={dados.payRecItems}
+        totalPay={dados.totalPay}
+        totalRec={dados.totalRec}
         onDateChange={atualizarDados}
         isLoading={isLoading}
       />

@@ -30,20 +30,23 @@ import { salvarPayRec } from '@/app/actions/salvarPayRec'
 import { DeletePayRec } from '@/app/actions/deletePayRec'
 import { useToast } from '@/hooks/use-toast'
 import { ToastAction } from '@radix-ui/react-toast'
-import type { RetornoFetch, RetornoGetDados } from '@/app/types/RetornoFetch'
+
 import { DatePickerWithRange } from './datapick'
 import { truncateText } from '@/lib/truncateText'
-import { useRouter } from 'next/navigation'
-import router from 'next/router'
+import type { PayRecItem } from '@/app/types/RetornoFetch'
 
 interface FinancasProps {
-  dados: RetornoGetDados
+  dados: PayRecItem[]
+  totalPay: number
+  totalRec: number
   onDateChange: (ano: number, mes: number) => void
   isLoading: boolean
 }
 
 export default function Financas({
   dados,
+  totalPay,
+  totalRec,
   onDateChange,
   isLoading,
 }: FinancasProps) {
@@ -51,12 +54,10 @@ export default function Financas({
   const [acao, setAcao] = useState('')
 
   const [isOpen, setIsOpen] = useState(false)
-  const [selected, setSelected] = useState<RetornoFetch | null>(null)
-
-  console.log('uai uai', dados.totalPay)
+  const [selected, setSelected] = useState<PayRecItem | null>(null)
 
   // abrir drawer
-  const handleRowClick = async (transacao: RetornoFetch) => {
+  const handleRowClick = async (transacao: PayRecItem) => {
     await setSelected(transacao)
     await setIsOpen(true)
   }
@@ -132,7 +133,7 @@ export default function Financas({
               variant={'destructive'}
               className="w-full"
             >
-              <Label>PAY ${dados.totalPay && dados.totalPay}</Label>
+              <Label>PAY ${totalPay && totalPay}</Label>
             </Button>
           </div>
           <div className="flex items-center w-full ">
@@ -142,7 +143,7 @@ export default function Financas({
               onClick={() => setAcao('rec')}
               className="w-full"
             >
-              <Label>REC ${dados.totalRec && dados.totalRec}</Label>
+              <Label>REC ${totalRec && totalRec}</Label>
             </Button>
           </div>
         </div>
@@ -186,7 +187,7 @@ export default function Financas({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {dados.retornoFetch.map((pr, index) => (
+            {dados.map((pr, index) => (
               <TableRow
                 key={Number(index)}
                 onClick={() => handleRowClick(pr)}

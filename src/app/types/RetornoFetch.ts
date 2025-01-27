@@ -1,4 +1,4 @@
-export type RetornoFetch = {
+export type PayRecItem = {
   id: string
   text: string
   value: number
@@ -6,8 +6,8 @@ export type RetornoFetch = {
   tipo: string
 }
 
-export type RetornoGetDados = {
-  retornoFetch: RetornoFetch[]
+export type DadosFinanceiros = {
   totalPay: number
   totalRec: number
+  payRecItems: PayRecItem[]
 }

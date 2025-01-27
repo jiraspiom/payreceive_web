@@ -18,8 +18,8 @@ export default async function Home() {
         <h1 className="text-2xl font-bold mb-2">PAY-REC</h1>
         <h1 className="text-2xl font-bold mb-2">beta25.1.26</h1>
       </div>
-      {/* <FinancasWrapper getDados={getDados} dadosIniciais={dadosIniciais} /> */}
-      <FinancasWrapper dadosIniciais={dadosIniciais} />
+      <FinancasWrapper getDados={getDados} dadosIniciais={dadosIniciais} />
+      {/* <FinancasWrapper dadosIniciais={dadosIniciais} /> */}
     </main>
   )
 }

@@ -1,22 +1,22 @@
 'use server'
-import type { RetornoFetch, RetornoGetDados } from '@/app/types/RetornoFetch'
+import type { DadosFinanceiros, PayRecItem } from '@/app/types/RetornoFetch'
 import httpClientFetch from '@/http/client-fetch'
 
 export async function getDados(
   ano: number,
   mes: number
-): Promise<RetornoGetDados> {
+): Promise<DadosFinanceiros> {
   const baseUrl = 'https://payrec.vercel.app'
 
   // Fetch pagamentos e recebimentos com tipagem explícita
-  const payResult = await fetchData<RetornoFetch[]>(
+  const payResult = await fetchData<PayRecItem[]>(
     baseUrl,
     '/api/pay/payments',
     ano,
     mes
   )
 
-  const recResult = await fetchData<RetornoFetch[]>(
+  const recResult = await fetchData<PayRecItem[]>(
     baseUrl,
     '/api/rec/receives',
     ano,
@@ -40,7 +40,7 @@ export async function getDados(
 
   console.log('Busca concluída com sucesso.', totalPay)
 
-  return { retornoFetch: transacoesOrdenadas, totalPay, totalRec }
+  return { payRecItems: transacoesOrdenadas, totalPay, totalRec }
 
   // const responsepay = await httpClientFetch<
   //   { data: RetornoFetch[] },
