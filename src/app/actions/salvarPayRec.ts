@@ -38,6 +38,7 @@ export async function salvarPayRec(formData: FormData, acao: string) {
     throw new Error(`Erro ao criar ${acao}`)
   }
 
-  revalidatePath('/')
-  revalidatePath('/teste')
+  await revalidatePath('/')
+  await revalidatePath('/teste')
+  console.log('revalidado ou deu erro?')
 }

@@ -38,7 +38,7 @@ export async function getDados(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 
-  console.log('Busca concluída com sucesso.')
+  console.log('Busca concluída com sucesso.', totalPay)
 
   return { retornoFetch: transacoesOrdenadas, totalPay, totalRec }
 

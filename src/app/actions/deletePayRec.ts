@@ -36,4 +36,5 @@ export async function DeletePayRec(id: string, tipo: string) {
 
   revalidatePath('/')
   revalidatePath('/teste')
+  console.log('revalidado ou deu erro?')
 }

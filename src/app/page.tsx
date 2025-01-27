@@ -10,7 +10,7 @@ export default async function Home() {
     dataAtual.getMonth() + 1
   )
 
-  console.log('pagina principal')
+  console.log('PAGINA PRINCIPAL PAY', dadosIniciais.totalPay)
 
   return (
     <main className="container mx-auto p-2  ">
@@ -18,7 +18,8 @@ export default async function Home() {
         <h1 className="text-2xl font-bold mb-2">PAY-REC</h1>
         <h1 className="text-2xl font-bold mb-2">beta25.1.26</h1>
       </div>
-      <FinancasWrapper getDados={getDados} dadosIniciais={dadosIniciais} />
+      {/* <FinancasWrapper getDados={getDados} dadosIniciais={dadosIniciais} /> */}
+      <FinancasWrapper dadosIniciais={dadosIniciais} />
     </main>
   )
 }

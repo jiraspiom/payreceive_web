@@ -53,6 +53,8 @@ export default function Financas({
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState<RetornoFetch | null>(null)
 
+  console.log('uai uai', dados.totalPay)
+
   // abrir drawer
   const handleRowClick = async (transacao: RetornoFetch) => {
     await setSelected(transacao)
