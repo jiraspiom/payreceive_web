@@ -39,5 +39,4 @@ export async function addPayRec(formData: FormData, tipo: string) {
   }
 
   await revalidatePath('/')
-  console.log('revalidado ou deu erro?')
 }

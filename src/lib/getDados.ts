@@ -38,8 +38,6 @@ export async function getDados(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 
-  console.log('Busca concluída com sucesso.', totalPay)
-
   return { payRecItems: transacoesOrdenadas, totalPay, totalRec }
 
   // const responsepay = await httpClientFetch<

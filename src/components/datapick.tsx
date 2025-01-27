@@ -51,7 +51,6 @@ export function DatePickerWithRange({
             variant={'ghost'}
             className={cn('w-[200px] justify-center text-center font-normal')}
           >
-            {/* <CalendarIcon className="mr-2 h-4 w-4" /> */}
             {format(currentMonth, 'yyyy / MMM').toUpperCase()}
           </Button>
         </PopoverTrigger>

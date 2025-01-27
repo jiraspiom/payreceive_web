@@ -9,8 +9,6 @@ export async function delPayRec(id: string, tipo: string) {
     rec: `/api/rec/receives/${id}`,
   }
 
-  console.log('ENTROU NO DELETE')
-
   const endpoint = endpoints[tipo]
 
   console.log('endpoint', endpoint)
@@ -37,5 +35,4 @@ export async function delPayRec(id: string, tipo: string) {
   )
 
   revalidatePath('/')
-  console.log('revalidado ou deu erro?')
 }

@@ -13,8 +13,6 @@ export default async function Home() {
     dataAtual.getMonth() + 1
   )
 
-  console.log('PAGINA PRINCIPAL PAY', dadosIniciais.totalPay)
-
   return (
     <main className="container mx-auto p-2  ">
       <div className="flex justify-between">

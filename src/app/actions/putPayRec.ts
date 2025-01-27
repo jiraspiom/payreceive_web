@@ -12,8 +12,6 @@ export async function putPayRec(
   const text = formData.get('text')
   const value = formData.get('value')
 
-  console.log('valores:', date, text, value)
-
   if (!text || !value || Number.isNaN(Number(value))) {
     console.error('Erro ao salvar o pay/rec')
     throw new Error('Dados inválidos fornecidos.')
