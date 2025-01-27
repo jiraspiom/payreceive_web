@@ -3,7 +3,7 @@
 import httpClientFetch from '@/http/client-fetch'
 import { revalidatePath } from 'next/cache'
 
-export async function salvarPayRec(formData: FormData, acao: string) {
+export async function addPayRec(formData: FormData, acao: string) {
   const text = formData.get('text')
   const value = formData.get('value')
 
@@ -39,6 +39,5 @@ export async function salvarPayRec(formData: FormData, acao: string) {
   }
 
   await revalidatePath('/')
-  await revalidatePath('/teste')
   console.log('revalidado ou deu erro?')
 }

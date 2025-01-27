@@ -26,7 +26,7 @@ import {
   DrawerClose,
 } from './ui/drawer'
 import { cn } from '@/lib/utils'
-import { salvarPayRec } from '@/app/actions/salvarPayRec'
+import { addPayRec } from '@/app/actions/addPayRec'
 import { DeletePayRec } from '@/app/actions/deletePayRec'
 import { useToast } from '@/hooks/use-toast'
 import { ToastAction } from '@radix-ui/react-toast'
@@ -40,6 +40,7 @@ interface FinancasProps {
   totalPay: number
   totalRec: number
   onDateChange: (ano: number, mes: number) => void
+  onAddPayRec: (formData: FormData, acao: string) => void
   isLoading: boolean
 }
 
@@ -48,6 +49,7 @@ export default function Financas({
   totalPay,
   totalRec,
   onDateChange,
+  onAddPayRec,
   isLoading,
 }: FinancasProps) {
   const { toast } = useToast()
@@ -64,7 +66,7 @@ export default function Financas({
 
   const handleEnviar = async (formData: FormData) => {
     try {
-      await salvarPayRec(formData, acao)
+      await onAddPayRec(formData, acao)
 
       toast({
         title: 'Success',
@@ -182,37 +184,39 @@ export default function Financas({
           <TableHeader>
             <TableRow>
               {/* <TableHead className="w-10">date</TableHead> */}
-              <TableHead className="w-2/3" />
+              <TableHead className="w-3/3" />
               {/* <TableHead className="w-1/3 text-center">$</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {dados.map((pr, index) => (
+            {dados.map((item, index) => (
               <TableRow
                 key={Number(index)}
-                onClick={() => handleRowClick(pr)}
+                onClick={() => handleRowClick(item)}
                 className={cn([
                   'transition-transform duration-3001 cursor-pointer hover:bg-muted/50',
                 ])}
               >
                 {/* <TableCell>{format(tra.date, 'dd/mm/yyyy')}</TableCell> */}
                 <TableCell className=" w-2/3">
-                  <div className="text-xs">{format(pr.date, 'dd/MM/yyyy')}</div>
-                  <div className="text-xl">{truncateText(pr.text, 30)}</div>
+                  <div className="text-xs">
+                    {format(item.date, 'dd/MM/yyyy')}
+                  </div>
+                  <div className="text-xl">{truncateText(item.text, 30)}</div>
                 </TableCell>
                 <TableCell
                   className={cn([
                     'text-end',
-                    pr.tipo === 'rec' ? 'text-purple-500' : 'text-red-600',
+                    item.tipo === 'rec' ? 'text-purple-500' : 'text-red-600',
                     'w-1/3 ',
                   ])}
                 >
-                  {pr.tipo === 'rec'
-                    ? pr.value.toLocaleString('en-US', {
+                  {item.tipo === 'rec'
+                    ? item.value.toLocaleString('en-US', {
                         style: 'currency',
                         currency: 'USD',
                       })
-                    : `- ${pr.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`}
+                    : `- ${item.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`}
                 </TableCell>
               </TableRow>
             ))}
