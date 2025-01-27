@@ -3,6 +3,7 @@
 import { FinancasWrapper } from '@/components/financas-wrapper'
 import { getDados } from '@/lib/getDados'
 import { addPayRec } from './actions/addPayRec'
+import { delPayRec } from './actions/delPayRec'
 
 export default async function Home() {
   const dataAtual = new Date()
@@ -22,6 +23,7 @@ export default async function Home() {
       <FinancasWrapper
         getDados={getDados}
         addPayRec={addPayRec}
+        delPayRec={delPayRec}
         dadosIniciais={dadosIniciais}
       />
       {/* <FinancasWrapper dadosIniciais={dadosIniciais} /> */}

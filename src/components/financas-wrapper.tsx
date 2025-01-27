@@ -7,12 +7,14 @@ import Financas from './Financas'
 interface FinancasWrapperProps {
   getDados: (ano: number, mes: number) => Promise<DadosFinanceiros>
   addPayRec: (formData: FormData, acao: string) => Promise<void>
+  delPayRec: (id: string, tipo: string) => Promise<void>
   dadosIniciais: DadosFinanceiros
 }
 
 export function FinancasWrapper({
   getDados,
   addPayRec,
+  delPayRec,
   dadosIniciais,
 }: FinancasWrapperProps) {
   const [dados, setDados] = useState(dadosIniciais)
@@ -25,6 +27,8 @@ export function FinancasWrapper({
     try {
       const novosDados = await getDados(ano, mes)
 
+      setAnoAtual(ano)
+      setMesAtual(mes)
       setDados(novosDados)
     } catch (error) {
       console.error('Erro ao buscar dados:', error)
@@ -43,6 +47,16 @@ export function FinancasWrapper({
     }
   }
 
+  const handleDelPayRec = async (id: string, tipo: string) => {
+    try {
+      await delPayRec(id, tipo)
+      const newData = await getDados(anoAtual, mesAtual)
+      setDados(newData)
+    } catch (error) {
+      console.error('Erro ao adicionar registro:', error)
+    }
+  }
+
   return (
     <div>
       <Financas
@@ -51,6 +65,7 @@ export function FinancasWrapper({
         totalRec={dados.totalRec}
         onDateChange={atualizarDados}
         onAddPayRec={handleAddPayRec}
+        onDelPayRec={handleDelPayRec}
         isLoading={isLoading}
       />
     </div>

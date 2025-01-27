@@ -26,14 +26,13 @@ import {
   DrawerClose,
 } from './ui/drawer'
 import { cn } from '@/lib/utils'
-import { addPayRec } from '@/app/actions/addPayRec'
-import { DeletePayRec } from '@/app/actions/deletePayRec'
 import { useToast } from '@/hooks/use-toast'
 import { ToastAction } from '@radix-ui/react-toast'
 
 import { DatePickerWithRange } from './datapick'
 import { truncateText } from '@/lib/truncateText'
 import type { PayRecItem } from '@/app/types/RetornoFetch'
+import AddPayRec from './add-pay-rec'
 
 interface FinancasProps {
   dados: PayRecItem[]
@@ -41,6 +40,7 @@ interface FinancasProps {
   totalRec: number
   onDateChange: (ano: number, mes: number) => void
   onAddPayRec: (formData: FormData, acao: string) => void
+  onDelPayRec: (id: string, tipo: string) => Promise<void>
   isLoading: boolean
 }
 
@@ -50,10 +50,10 @@ export default function Financas({
   totalRec,
   onDateChange,
   onAddPayRec,
+  onDelPayRec,
   isLoading,
 }: FinancasProps) {
   const { toast } = useToast()
-  const [acao, setAcao] = useState('')
 
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState<PayRecItem | null>(null)
@@ -64,34 +64,9 @@ export default function Financas({
     await setIsOpen(true)
   }
 
-  const handleEnviar = async (formData: FormData) => {
-    try {
-      await onAddPayRec(formData, acao)
-
-      toast({
-        title: 'Success',
-        description: 'Transaction saved successfully',
-      })
-    } catch (error) {
-      if (error instanceof Error) {
-        toast({
-          title: 'Erro',
-          description: `Erro ao salvar ${acao} ${error.message}`,
-          variant: 'destructive',
-        })
-      } else {
-        toast({
-          title: 'Erro',
-          description: `Erro ao salvar ${acao}`,
-          variant: 'destructive',
-        })
-      }
-    }
-  }
-
   const handleDelete = async (id: string, tipo: string) => {
     try {
-      await DeletePayRec(id, tipo)
+      await onDelPayRec(id, tipo)
 
       toast({
         title: 'Deleted',
@@ -125,53 +100,14 @@ export default function Financas({
 
   return (
     <div>
-      <form action={handleEnviar} className="space-y-4 mb-6">
-        <div className="flex justify-between mt-2 gap-4">
-          <div className="flex items-center w-full ">
-            <Button
-              type="submit"
-              value="pay"
-              onClick={() => setAcao('pay')}
-              variant={'destructive'}
-              className="w-full"
-            >
-              <Label>PAY ${totalPay && totalPay}</Label>
-            </Button>
-          </div>
-          <div className="flex items-center w-full ">
-            <Button
-              type="submit"
-              value="rec"
-              onClick={() => setAcao('rec')}
-              className="w-full"
-            >
-              <Label>REC ${totalRec && totalRec}</Label>
-            </Button>
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <div className="w-8/12">
-            <Input
-              name="text"
-              type="text"
-              maxLength={50}
-              required
-              placeholder="Description"
-            />
-          </div>
-          <div className="w-4/12">
-            <Input
-              name="value"
-              type="number"
-              maxLength={12}
-              required
-              placeholder="$$$"
-            />
-          </div>
-        </div>
-      </form>
+      <AddPayRec
+        onAddPayRec={onAddPayRec}
+        totalPay={totalPay}
+        totalRec={totalRec}
+      />
 
       <hr className="bg-white" />
+
       <DatePickerWithRange onDateChange={onDateChange} />
 
       <hr className="bg-white" />

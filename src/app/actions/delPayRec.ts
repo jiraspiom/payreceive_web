@@ -3,7 +3,7 @@
 import httpClientFetch from '@/http/client-fetch'
 import { revalidatePath } from 'next/cache'
 
-export async function DeletePayRec(id: string, tipo: string) {
+export async function delPayRec(id: string, tipo: string) {
   const endpoints: Record<string, string> = {
     pay: `/api/pay/payments/${id}`,
     rec: `/api/rec/receives/${id}`,
