@@ -7,7 +7,7 @@ import { useState } from 'react'
 interface AddPayRecProps {
   totalPay: number
   totalRec: number
-  onAddPayRec: (formdata: FormData, acao: string) => void
+  onAddPayRec: (formdata: FormData, tipo: string) => void
 }
 
 export default function AddPayRec({
@@ -15,10 +15,10 @@ export default function AddPayRec({
   totalPay,
   totalRec,
 }: AddPayRecProps) {
-  const [acao, setAcao] = useState('')
+  const [tipo, setTipo] = useState('')
   const handleSubmit = async (formData: FormData) => {
     try {
-      await onAddPayRec(formData, acao)
+      await onAddPayRec(formData, tipo)
 
       toast({
         title: 'Success',
@@ -28,13 +28,13 @@ export default function AddPayRec({
       if (error instanceof Error) {
         toast({
           title: 'Erro',
-          description: `Erro ao salvar ${acao} ${error.message}`,
+          description: `Erro ao salvar ${tipo} ${error.message}`,
           variant: 'destructive',
         })
       } else {
         toast({
           title: 'Erro',
-          description: `Erro ao salvar ${acao}`,
+          description: `Erro ao salvar ${tipo}`,
           variant: 'destructive',
         })
       }
@@ -47,7 +47,7 @@ export default function AddPayRec({
           <Button
             type="submit"
             value="pay"
-            onClick={() => setAcao('pay')}
+            onClick={() => setTipo('pay')}
             variant={'destructive'}
             className="w-full"
           >
@@ -58,7 +58,7 @@ export default function AddPayRec({
           <Button
             type="submit"
             value="rec"
-            onClick={() => setAcao('rec')}
+            onClick={() => setTipo('rec')}
             className="w-full"
           >
             <Label>REC ${totalRec && totalRec}</Label>

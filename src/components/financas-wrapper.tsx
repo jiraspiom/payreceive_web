@@ -6,8 +6,14 @@ import Financas from './Financas'
 
 interface FinancasWrapperProps {
   getDados: (ano: number, mes: number) => Promise<DadosFinanceiros>
-  addPayRec: (formData: FormData, acao: string) => Promise<void>
+  addPayRec: (formData: FormData, tipo: string) => Promise<void>
   delPayRec: (id: string, tipo: string) => Promise<void>
+  putPayRec: (
+    id: string,
+    formData: FormData,
+    acao: string,
+    date: Date
+  ) => Promise<void>
   dadosIniciais: DadosFinanceiros
 }
 
@@ -15,6 +21,7 @@ export function FinancasWrapper({
   getDados,
   addPayRec,
   delPayRec,
+  putPayRec,
   dadosIniciais,
 }: FinancasWrapperProps) {
   const [dados, setDados] = useState(dadosIniciais)
@@ -26,10 +33,9 @@ export function FinancasWrapper({
     setIsLoading(true)
     try {
       const novosDados = await getDados(ano, mes)
-
+      setDados(novosDados)
       setAnoAtual(ano)
       setMesAtual(mes)
-      setDados(novosDados)
     } catch (error) {
       console.error('Erro ao buscar dados:', error)
     } finally {
@@ -37,11 +43,10 @@ export function FinancasWrapper({
     }
   }
 
-  const handleAddPayRec = async (formData: FormData, acao: string) => {
+  const handleAddPayRec = async (formData: FormData, tipo: string) => {
     try {
-      await addPayRec(formData, acao)
-      const newData = await getDados(anoAtual, mesAtual)
-      setDados(newData)
+      await addPayRec(formData, tipo)
+      await atualizarDados(anoAtual, mesAtual)
     } catch (error) {
       console.error('Erro ao adicionar registro:', error)
     }
@@ -50,10 +55,23 @@ export function FinancasWrapper({
   const handleDelPayRec = async (id: string, tipo: string) => {
     try {
       await delPayRec(id, tipo)
-      const newData = await getDados(anoAtual, mesAtual)
-      setDados(newData)
+      await atualizarDados(anoAtual, mesAtual)
     } catch (error) {
-      console.error('Erro ao adicionar registro:', error)
+      console.error('Erro ao deletar registro:', error)
+    }
+  }
+
+  const handlePutPayRec = async (
+    id: string,
+    formData: FormData,
+    acao: string,
+    date: Date
+  ) => {
+    try {
+      await putPayRec(id, formData, acao, date)
+      await atualizarDados(anoAtual, mesAtual)
+    } catch (error) {
+      console.error('Erro ao atualizar registro:', error)
     }
   }
 
@@ -66,6 +84,7 @@ export function FinancasWrapper({
         onDateChange={atualizarDados}
         onAddPayRec={handleAddPayRec}
         onDelPayRec={handleDelPayRec}
+        onPutPayRec={handlePutPayRec}
         isLoading={isLoading}
       />
     </div>

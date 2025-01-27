@@ -1,46 +1,29 @@
 'use client'
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from './ui/table'
-import { Label } from './ui/label'
-import { Button } from './ui/button'
-import { Trash } from 'lucide-react'
-import { Input } from './ui/input'
+import { Table, TableBody, TableCell, TableRow } from './ui/table'
 import { format } from 'date-fns'
-import type React from 'react'
-import { useState } from 'react'
-
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerClose,
-} from './ui/drawer'
 import { cn } from '@/lib/utils'
-import { useToast } from '@/hooks/use-toast'
-import { ToastAction } from '@radix-ui/react-toast'
-
 import { DatePickerWithRange } from './datapick'
 import { truncateText } from '@/lib/truncateText'
-import type { PayRecItem } from '@/app/types/RetornoFetch'
 import AddPayRec from './add-pay-rec'
+import EditarPayRecDrawer from './editar-pay-rec-drawer'
+import type { PayRecItem } from '@/app/types/RetornoFetch'
+import type React from 'react'
+import { useState } from 'react'
 
 interface FinancasProps {
   dados: PayRecItem[]
   totalPay: number
   totalRec: number
   onDateChange: (ano: number, mes: number) => void
-  onAddPayRec: (formData: FormData, acao: string) => void
+  onAddPayRec: (formData: FormData, tipo: string) => void
   onDelPayRec: (id: string, tipo: string) => Promise<void>
+  onPutPayRec: (
+    id: string,
+    formData: FormData,
+    tipo: string,
+    date: Date
+  ) => Promise<void>
   isLoading: boolean
 }
 
@@ -51,51 +34,22 @@ export default function Financas({
   onDateChange,
   onAddPayRec,
   onDelPayRec,
+  onPutPayRec,
   isLoading,
 }: FinancasProps) {
-  const { toast } = useToast()
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [selected, setSelected] = useState<PayRecItem | null>(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [registroSelecionado, setRegistroSelecionado] =
+    useState<PayRecItem | null>(null)
 
   // abrir drawer
-  const handleRowClick = async (transacao: PayRecItem) => {
-    await setSelected(transacao)
-    await setIsOpen(true)
+  const handleRowClick = async (registro: PayRecItem) => {
+    await setRegistroSelecionado(registro)
+    await setIsDrawerOpen(true)
   }
 
-  const handleDelete = async (id: string, tipo: string) => {
-    try {
-      await onDelPayRec(id, tipo)
-
-      toast({
-        title: 'Deleted',
-        description: 'Transaction deleted successfully',
-        variant: 'secondary',
-        action: (
-          <ToastAction
-            onClick={() => console.log('deletando')}
-            altText="Desfazer delete"
-          >
-            Undo
-          </ToastAction>
-        ),
-      })
-    } catch (error) {
-      if (error instanceof Error) {
-        toast({
-          title: 'Erro',
-          description: `Erro ao deletar ${tipo} ${error.message}`,
-          variant: 'destructive',
-        })
-      } else {
-        toast({
-          title: 'Erro',
-          description: `Erro ao deletar ${tipo}`,
-          variant: 'destructive',
-        })
-      }
-    }
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false)
+    setRegistroSelecionado(null)
   }
 
   return (
@@ -107,23 +61,15 @@ export default function Financas({
       />
 
       <hr className="bg-white" />
-
       <DatePickerWithRange onDateChange={onDateChange} />
-
       <hr className="bg-white" />
+
       {isLoading ? (
         <div className="flex justify-center items-center text-center animate-ping">
           ...
         </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {/* <TableHead className="w-10">date</TableHead> */}
-              <TableHead className="w-3/3" />
-              {/* <TableHead className="w-1/3 text-center">$</TableHead> */}
-            </TableRow>
-          </TableHeader>
+        <Table className="mt-4">
           <TableBody>
             {dados.map((item, index) => (
               <TableRow
@@ -160,54 +106,13 @@ export default function Financas({
         </Table>
       )}
 
-      <Drawer open={isOpen} onOpenChange={setIsOpen}>
-        <DrawerContent>
-          {selected && (
-            <>
-              <DrawerHeader>
-                <DrawerTitle>Details of {selected?.tipo}</DrawerTitle>
-                <DrawerDescription>
-                  Edit or Delete your {selected?.tipo}.
-                </DrawerDescription>
-              </DrawerHeader>
-
-              <div className="p-4 space-y-4">
-                <div className="flex justify-between">
-                  <strong>Data:</strong>
-                  {format(selected.date, 'dd/MM/yyyy').toString()}
-                  <DrawerClose asChild>
-                    <Button
-                      onClick={() => handleDelete(selected.id, selected.tipo)}
-                      variant={'destructive'}
-                    >
-                      <Trash />
-                    </Button>
-                  </DrawerClose>
-                </div>
-                <p>
-                  <strong>des:</strong> {selected.text}
-                </p>
-                <div className="flex justify-between">
-                  <div>
-                    <strong>value: </strong> {selected.value}
-                  </div>
-                  {/* <Button
-                    onClick={() => DeletePayRec(selected.id, selected.tipo)}
-                    variant={'secondary'}
-                  >
-                    <Pencil />
-                  </Button> */}
-                </div>
-              </div>
-            </>
-          )}
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button variant="outline">Fechar</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <EditarPayRecDrawer
+        registro={registroSelecionado}
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+        onPutPayRec={onPutPayRec}
+        onDelPayRec={onDelPayRec}
+      />
     </div>
   )
 }
