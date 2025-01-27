@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import type { RetornoGetDados } from '@/app/types/RetornoFetch'
+import type { DadosFinanceiros } from '@/app/types/RetornoFetch'
 import { Financas2 } from './Financas2'
 
 interface FinancasWrapperProps {
-  getDados: (ano: number, mes: number) => Promise<RetornoGetDados>
-  dadosIniciais: RetornoGetDados
+  getDados: (ano: number, mes: number) => Promise<DadosFinanceiros>
+  dadosIniciais: DadosFinanceiros
 }
 
 export function FinancasWrapper2({

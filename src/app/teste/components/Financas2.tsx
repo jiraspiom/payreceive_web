@@ -10,11 +10,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import type { RetornoGetDados } from '@/app/types/RetornoFetch'
+import type { DadosFinanceiros } from '@/app/types/RetornoFetch'
 import { DatePickerWithRange2 } from './datapick2'
 
 interface FinancasProps {
-  dados: RetornoGetDados
+  dados: DadosFinanceiros
   onDateChange: (ano: number, mes: number) => void
   isLoading: boolean
 }
@@ -35,7 +35,7 @@ export function Financas2({ dados, onDateChange, isLoading }: FinancasProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {dados.retornoFetch?.map(item => (
+            {dados.payRecItems?.map(item => (
               <TableRow key={item.id}>
                 <TableCell>{item.text}</TableCell>
                 <TableCell>{item.value.toFixed(2)}</TableCell>
